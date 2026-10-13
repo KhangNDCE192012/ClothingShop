@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {getCustomers} from "../services/UserService";
+import {deleteCustomer, getCustomers, lockCustomer} from "../services/UserService";
 import "../css/AdminUsers.css";
 
 const formatDate = (value) => {
@@ -22,6 +22,8 @@ export default function AdminUsers() {
     const [status, setStatus] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [actionError, setActionError] = useState("");
+    const [pendingAction, setPendingAction] = useState(null);
 
     async function loadCustomers() {
         setLoading(true);
@@ -76,6 +78,48 @@ export default function AdminUsers() {
             return matchesStatus && matchesSearch;
         });
     }, [customers, search, status]);
+
+    async function handleLock(customer) {
+        const confirmed = window.confirm(
+            `Khóa tài khoản “${customer.username}”? Tài khoản này sẽ bị hạn chế sử dụng hệ thống.`
+        );
+
+        if (!confirmed) return;
+
+        setPendingAction({id: customer.id, type: "lock"});
+        setActionError("");
+
+        try {
+            const updatedCustomer = await lockCustomer(customer.id);
+            setCustomers((current) => current.map((item) =>
+                item.id === updatedCustomer.id ? updatedCustomer : item
+            ));
+        } catch (err) {
+            setActionError(err.message || "Không thể khóa tài khoản.");
+        } finally {
+            setPendingAction(null);
+        }
+    }
+
+    async function handleDelete(customer) {
+        const confirmed = window.confirm(
+            `Xóa vĩnh viễn tài khoản “${customer.username}”? Thao tác này không thể hoàn tác.`
+        );
+
+        if (!confirmed) return;
+
+        setPendingAction({id: customer.id, type: "delete"});
+        setActionError("");
+
+        try {
+            await deleteCustomer(customer.id);
+            setCustomers((current) => current.filter((item) => item.id !== customer.id));
+        } catch (err) {
+            setActionError(err.message || "Không thể xóa tài khoản.");
+        } finally {
+            setPendingAction(null);
+        }
+    }
 
     return (
         <main className="admin-users-page">
@@ -147,6 +191,13 @@ export default function AdminUsers() {
                         </label>
                     </div>
 
+                    {actionError && (
+                        <div className="admin-action-error" role="alert">
+                            <span>{actionError}</span>
+                            <button type="button" onClick={() => setActionError("")} aria-label="Đóng thông báo">×</button>
+                        </div>
+                    )}
+
                     {loading ? (
                         <div className="admin-state">
                             <div className="admin-spinner"/>
@@ -173,6 +224,7 @@ export default function AdminUsers() {
                                     <th>Vai trò</th>
                                     <th>Trạng thái</th>
                                     <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -202,6 +254,30 @@ export default function AdminUsers() {
                                             </span>
                                         </td>
                                         <td>{formatDate(customer.createdAt)}</td>
+                                        <td>
+                                            <div className="admin-actions">
+                                                <button
+                                                    type="button"
+                                                    className="admin-action-lock"
+                                                    disabled={customer.status === "BANNED" || pendingAction?.id === customer.id}
+                                                    onClick={() => handleLock(customer)}
+                                                >
+                                                    {pendingAction?.id === customer.id && pendingAction.type === "lock"
+                                                        ? "Đang khóa..."
+                                                        : customer.status === "BANNED" ? "Đã khóa" : "Khóa"}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="admin-action-delete"
+                                                    disabled={pendingAction?.id === customer.id}
+                                                    onClick={() => handleDelete(customer)}
+                                                >
+                                                    {pendingAction?.id === customer.id && pendingAction.type === "delete"
+                                                        ? "Đang xóa..."
+                                                        : "Xóa"}
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                                 </tbody>

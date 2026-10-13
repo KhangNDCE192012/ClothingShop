@@ -80,6 +80,10 @@ public class User {
         return status;
     }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
