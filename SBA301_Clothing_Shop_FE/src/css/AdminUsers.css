@@ -306,6 +306,7 @@
 }
 
 .admin-status-inactive,
+.admin-status-banned,
 .admin-status-blocked {
     background: #fef3f2;
     color: #b42318;
@@ -329,6 +330,65 @@
 
 .admin-state-error strong {
     color: #b42318;
+}
+
+.admin-action-error {
+    margin: 14px 20px 0;
+    padding: 11px 13px;
+    border: 1px solid #fecdca;
+    border-radius: 8px;
+    background: #fef3f2;
+    color: #b42318;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 13px;
+}
+
+.admin-action-error button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 19px;
+    line-height: 1;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.admin-actions button {
+    min-width: 58px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: #fff;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-action-lock {
+    border: 1px solid #f79009;
+    color: #b54708;
+}
+
+.admin-action-delete {
+    border: 1px solid #f04438;
+    color: #b42318;
+}
+
+.admin-actions button:hover:not(:disabled) {
+    background: #f9fafb;
+}
+
+.admin-actions button:disabled {
+    border-color: #d0d5dd;
+    color: #98a2b3;
+    cursor: not-allowed;
 }
 
 .admin-spinner {
