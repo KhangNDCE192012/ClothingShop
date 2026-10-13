@@ -1,0 +1,140 @@
+.shop-intro {
+    width: 100%;
+    background: #f6f4ef;
+    padding: 90px 24px;
+}
+
+.shop-intro-wrapper {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.shop-intro-heading {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.shop-intro-label {
+    margin: 0 0 12px;
+    color: #8a8178;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.shop-intro-title {
+    margin: 0;
+    color: #202020;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.shop-intro-divider {
+    width: 55px;
+    height: 2px;
+    margin: 22px auto 26px;
+    background: #202020;
+}
+
+.shop-intro-description {
+    margin: 0 auto;
+    color: #686868;
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.shop-intro-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+
+    margin-top: 58px;
+}
+
+.shop-intro-card {
+    min-height: 220px;
+    padding: 32px;
+
+    background: #ffffff;
+    border: 1px solid #e7e2dc;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+
+    transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+}
+
+.shop-intro-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.09);
+}
+
+.shop-intro-number {
+    display: inline-block;
+    margin-bottom: 24px;
+
+    color: #a59b90;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.shop-intro-card h3 {
+    margin: 0 0 12px;
+
+    color: #252525;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.shop-intro-card p {
+    margin: 0;
+
+    color: #777;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+    .shop-intro {
+        padding: 70px 22px;
+    }
+
+    .shop-intro-features {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        margin-top: 42px;
+    }
+
+    .shop-intro-card {
+        min-height: auto;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 576px) {
+    .shop-intro {
+        padding: 55px 18px;
+    }
+
+    .shop-intro-title {
+        font-size: 32px;
+    }
+
+    .shop-intro-description {
+        font-size: 15px;
+    }
+
+    .shop-intro-card {
+        padding: 26px 22px;
+    }
+}
