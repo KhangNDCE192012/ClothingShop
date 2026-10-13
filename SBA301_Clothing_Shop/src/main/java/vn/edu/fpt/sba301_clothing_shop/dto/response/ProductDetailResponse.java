@@ -8,12 +8,7 @@ import java.time.LocalDateTime;
 public record ProductDetailResponse(
         Integer id,
         String name,
-        BigDecimal price,
-        String image,
-        String size,
-        String color,
-        Integer quantity,
-        Integer categoryId,
+        Integer productId,
         String categoryName,
         String status,
         LocalDateTime createdAt
@@ -22,11 +17,6 @@ public record ProductDetailResponse(
         return new ProductDetailResponse(
                 product.getId(),
                 product.getName(),
-                product.getPrice(),
-                product.getImage(),
-                product.getSize(),
-                product.getColor(),
-                product.getQuantity(),
                 product.getCategory().getId(),
                 product.getCategory().getName(),
                 product.getStatus(),

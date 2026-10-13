@@ -15,21 +15,6 @@ public class Product {
     @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal price;
-
-    @Column(length = 500)
-    private String image;
-
-    @Column(length = 20)
-    private String size;
-
-    @Column(length = 50)
-    private String color;
-
-    @Column(nullable = false)
-    private Integer quantity;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -51,25 +36,7 @@ public class Product {
         return name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
 
-    public String getImage() {
-        return image;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
 
     public Category getCategory() {
         return category;
@@ -89,26 +56,6 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public void setCategory(Category category) {
