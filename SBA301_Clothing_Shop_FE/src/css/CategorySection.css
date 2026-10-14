@@ -1,0 +1,334 @@
+.category-section {
+    width: 100%;
+    padding: 90px 24px;
+
+    background-color: #ffffff;
+}
+
+.category-wrapper {
+    width: 100%;
+    max-width: 1280px;
+
+    margin: 0 auto;
+}
+
+
+/* HEADING */
+
+.category-heading {
+    max-width: 720px;
+
+    margin: 0 auto 52px;
+
+    text-align: center;
+}
+
+.category-label {
+    margin: 0 0 12px;
+
+    color: #8a8178;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.category-title {
+    margin: 0;
+
+    color: #202020;
+
+    font-size: 42px;
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+.category-divider {
+    width: 54px;
+    height: 2px;
+
+    margin: 20px auto 24px;
+
+    background-color: #202020;
+}
+
+.category-description {
+    margin: 0;
+
+    color: #737373;
+
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+
+/* GRID */
+
+.category-grid {
+    display: grid;
+
+    grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+
+/* CARD */
+
+.category-card {
+    min-width: 0;
+
+    overflow: hidden;
+
+    background-color: #f7f5f1;
+
+    border: 1px solid #e7e3dc;
+
+    border-radius: 16px;
+
+    transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow:
+            0 15px 35px rgba(0, 0, 0, 0.10);
+}
+
+
+/* IMAGE */
+
+.category-card-image {
+    position: relative;
+
+    width: 100%;
+    height: 260px;
+
+    overflow: hidden;
+
+    background-color: #ebe8e2;
+}
+
+.category-card-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+    object-position: center;
+
+    transition: transform 0.4s ease;
+}
+
+.category-card:hover
+.category-card-image img {
+    transform: scale(1.05);
+}
+
+
+/* IMAGE OVERLAY */
+
+.category-overlay {
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+            linear-gradient(
+                    to bottom,
+                    rgba(0, 0, 0, 0.18),
+                    transparent 45%
+            );
+}
+
+
+/* NUMBER + ARROW */
+
+.category-card-top {
+    position: absolute;
+
+    top: 20px;
+    left: 20px;
+    right: 20px;
+
+    z-index: 2;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category-number {
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+}
+
+.category-arrow {
+    color: #ffffff;
+
+    font-size: 24px;
+    line-height: 1;
+
+    transition: transform 0.25s ease;
+}
+
+.category-card:hover
+.category-arrow {
+    transform: translate(3px, -3px);
+}
+
+
+/* NO IMAGE */
+
+.category-no-image {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #999999;
+
+    font-size: 14px;
+
+    background-color: #ebe8e2;
+}
+
+
+/* CONTENT */
+
+.category-card-content {
+    padding: 24px;
+}
+
+.category-card-content h3 {
+    margin: 0 0 10px;
+
+    color: #222222;
+
+    font-size: 24px;
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+.category-card-description {
+    min-height: 50px;
+
+    margin: 0;
+
+    color: #777777;
+
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+
+/* PRICE */
+
+.category-card-footer {
+    display: flex;
+    align-items: baseline;
+
+    gap: 8px;
+
+    margin-top: 20px;
+    padding-top: 17px;
+
+    border-top:
+            1px solid #ddd8d0;
+}
+
+.category-price-label {
+    color: #999999;
+
+    font-size: 13px;
+}
+
+.category-price {
+    color: #222222;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+/* STATUS */
+
+.category-status {
+    padding: 40px 20px;
+
+    color: #777777;
+
+    font-size: 16px;
+
+    text-align: center;
+}
+
+.category-status-error {
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    color: #aa3333;
+
+    background-color: #fff2f2;
+
+    border: 1px solid #efd4d4;
+
+    border-radius: 10px;
+}
+
+
+/* TABLET */
+
+@media (max-width: 992px) {
+
+    .category-section {
+        padding: 70px 22px;
+    }
+
+    .category-grid {
+        grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 576px) {
+
+    .category-section {
+        padding: 55px 18px;
+    }
+
+    .category-title {
+        font-size: 32px;
+    }
+
+    .category-description {
+        font-size: 15px;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-card-image {
+        height: 240px;
+    }
+}
