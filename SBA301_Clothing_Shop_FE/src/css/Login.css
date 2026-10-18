@@ -1,0 +1,127 @@
+.login-page {
+    min-height: calc(100vh - 68px);
+    padding: 48px 20px;
+    display: grid;
+    place-items: center;
+    background:
+            radial-gradient(circle at 12% 18%, rgba(194, 219, 202, 0.75), transparent 30%),
+            radial-gradient(circle at 88% 82%, rgba(227, 207, 173, 0.62), transparent 28%),
+            #f5f6f2;
+}
+
+.login-card {
+    width: min(100%, 440px);
+    padding: 42px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(23, 63, 44, 0.11);
+    border-radius: 22px;
+    box-shadow: 0 24px 70px rgba(24, 47, 35, 0.13);
+}
+
+.login-brand-mark {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 22px;
+    display: grid;
+    place-items: center;
+    color: white;
+    background: #173f2c;
+    border-radius: 16px;
+    font-weight: 800;
+}
+
+.login-eyebrow {
+    margin-bottom: 8px;
+    color: #6c8075;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+}
+
+.login-card h1 {
+    margin: 0;
+    color: #17211c;
+    font-size: clamp(29px, 5vw, 38px);
+    line-height: 1.15;
+}
+
+.login-description {
+    margin: 12px 0 30px;
+    color: #68756f;
+    line-height: 1.6;
+}
+
+.login-card form,
+.login-card label {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-card form {
+    gap: 20px;
+}
+
+.login-card label {
+    gap: 8px;
+    color: #2d3b34;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 13px 14px;
+    color: #17211c;
+    background: #fff;
+    border: 1px solid #ccd5d0;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-card input:focus {
+    border-color: #2c6b4b;
+    box-shadow: 0 0 0 3px rgba(44, 107, 75, 0.13);
+}
+
+.login-card form > button {
+    min-height: 48px;
+    margin-top: 4px;
+    color: white;
+    background: #173f2c;
+    border: 0;
+    border-radius: 11px;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.login-card form > button:hover:not(:disabled) {
+    background: #235a40;
+}
+
+.login-card form > button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.login-error {
+    padding: 11px 13px;
+    color: #972d2d;
+    background: #fff0f0;
+    border: 1px solid #f1c5c5;
+    border-radius: 9px;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+@media (max-width: 520px) {
+    .login-page {
+        align-items: start;
+        padding: 28px 14px;
+    }
+
+    .login-card {
+        padding: 30px 23px;
+        border-radius: 17px;
+    }
+}
