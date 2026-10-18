@@ -15,6 +15,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     @EntityGraph(attributePaths = "role")
+    Optional<User> findByUsernameIgnoreCase(String username);
+
+    @EntityGraph(attributePaths = "role")
     List<User> findAllByRoleNameIgnoreCaseOrderByCreatedAtDesc(String roleName);
 
     @EntityGraph(attributePaths = "role")

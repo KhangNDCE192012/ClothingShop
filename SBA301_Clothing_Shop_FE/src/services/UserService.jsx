@@ -1,4 +1,11 @@
+import {getAccessToken} from "./AuthService";
+
 const API_URL = "http://localhost:8080/api/users";
+
+function authHeaders() {
+    const token = getAccessToken();
+    return token ? {Authorization: `Bearer ${token}`} : {};
+}
 
 async function throwResponseError(response, fallbackMessage) {
     let message = fallbackMessage;
@@ -14,7 +21,7 @@ async function throwResponseError(response, fallbackMessage) {
 }
 
 export async function getCustomers() {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {headers: authHeaders()});
 
     if (!response.ok) {
         await throwResponseError(response, "Không thể tải danh sách khách hàng");
@@ -26,6 +33,7 @@ export async function getCustomers() {
 export async function lockCustomer(userId) {
     const response = await fetch(`${API_URL}/${userId}/lock`, {
         method: "PATCH",
+        headers: authHeaders(),
     });
 
     if (!response.ok) {
@@ -38,6 +46,7 @@ export async function lockCustomer(userId) {
 export async function deleteCustomer(userId) {
     const response = await fetch(`${API_URL}/${userId}`, {
         method: "DELETE",
+        headers: authHeaders(),
     });
 
     if (!response.ok) {

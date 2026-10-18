@@ -1,18 +1,31 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ProductDetail from "./pages/ProductDetail";
 import AdminUsers from "./pages/AdminUsers";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import AuthHeader from "./components/AuthHeader";
 
 function App() {
   return (
+    <>
+      <AuthHeader />
       <Routes>
-        {/* Các route khác của project đặt ở đây */}
-          <Route path="/" element={<Home />} />
-
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route
+          path="/admin/users"
+          element={(
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminUsers />
+            </ProtectedRoute>
+          )}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    </>
   );
 }
 
