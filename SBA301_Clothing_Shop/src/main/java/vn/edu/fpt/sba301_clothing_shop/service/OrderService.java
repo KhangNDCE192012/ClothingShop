@@ -170,11 +170,25 @@ public class OrderService {
         );
     }
 
+
     public List<Order> getAllOrder() {
-        return orderRepository.findAll();
+        return orderRepository.findAll()
+                .stream()
+                .filter(order ->
+                        !"DELETED".equalsIgnoreCase(order.getStatus()))
+                .toList();
     }
 
+
     public List<OrderDetail> getOrderById(Integer id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
+                "Không tìm thấy Order ID: "
+                        + id));
+        if ("DELETED".equalsIgnoreCase(order.getStatus())) {
+            throw new IllegalStateException(
+                    "Đơn hàng đã bị xóa, không thể truy cập."
+            );
+        }
         return orderDetailRepository.findByOrder_Id(id);
     }
 
@@ -182,7 +196,35 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
                 "Không tìm thấy Order ID: "
                         + id));
-        String status = orderStatusRequest.getStatus();
+
+        String currentStatus = order.getStatus();
+        if ("DELETED".equalsIgnoreCase(currentStatus)) {
+            throw new IllegalStateException(
+                    "Đơn hàng đã bị xóa, không thể thao tác."
+            );
+        }
+
+        if (orderStatusRequest == null
+                || orderStatusRequest.getStatus() == null
+                || orderStatusRequest.getStatus().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Trạng thái không được để trống."
+            );
+        }
+        String status = orderStatusRequest.getStatus().trim().toUpperCase();
+        Set<String> allowedStatuses = Set.of(
+                "PENDING",
+                "CONFIRMED",
+                "SHIPPING",
+                "COMPLETED",
+                "CANCELLED",
+                "DELETED"
+        );
+        if (!allowedStatuses.contains(status)) {
+            throw new IllegalArgumentException(
+                    "Trạng thái đơn hàng không hợp lệ."
+            );
+        }
         order.setStatus(status);
         return orderRepository.save(order);
     }

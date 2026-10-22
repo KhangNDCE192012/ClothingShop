@@ -116,3 +116,7 @@ export async function getOrderById(id) {
         ? data
         : data?.orders ?? data?.content ?? data?.data ?? [];
 }
+
+export async function deleteOrder(id) {
+    return updateOrderStatus(id, "DELETED");
+}

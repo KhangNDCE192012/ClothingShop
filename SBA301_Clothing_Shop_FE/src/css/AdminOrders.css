@@ -395,3 +395,24 @@
         min-width: 125px;
     }
 }
+
+.order-delete-button {
+    padding: 8px 14px;
+    border: 1px solid #dc2626;
+    border-radius: 7px;
+    background: #fff;
+    color: #dc2626;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.order-delete-button:hover:not(:disabled) {
+    background: #dc2626;
+    color: #fff;
+}
+
+.order-delete-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

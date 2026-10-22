@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
     getAllOrders,
     updateOrderStatus,
+    deleteOrder,
 } from "../services/OrderService";
 import "../css/AdminOrders.css";
 
@@ -181,6 +182,49 @@ export default function AdminOrders() {
         }
     }
 
+    async function handleDeleteOrder(orderId) {
+        if (orderId == null) return;
+
+        const confirmed = window.confirm(
+            `Bạn có chắc chắn muốn xóa đơn hàng #${orderId}? Đơn hàng sẽ được ẩn khỏi danh sách nhưng không bị xóa khỏi database.`
+        );
+
+        if (!confirmed) return;
+
+        const idKey = String(orderId);
+
+        if (updatingIds.includes(idKey)) return;
+
+        setUpdatingIds((previous) => [...previous, idKey]);
+        setUpdateMessage("");
+        setUpdateError("");
+
+        try {
+            await deleteOrder(orderId);
+
+            // Ẩn đơn hàng khỏi danh sách sau khi backend cập nhật thành công.
+            setOrders((previousOrders) =>
+                previousOrders.filter(
+                    (order) =>
+                        String(getOrderId(order)) !== idKey
+                )
+            );
+
+            setUpdateMessage(
+                `Đã xóa mềm đơn hàng #${orderId}.`
+            );
+        } catch (err) {
+            setUpdateError(
+                err.message || "Không thể xóa đơn hàng."
+            );
+        } finally {
+            setUpdatingIds((previous) =>
+                previous.filter((value) => value !== idKey)
+            );
+        }
+    }
+
+
     return (
         <main className="admin-orders-page">
             <div className="admin-orders-container">
@@ -308,6 +352,7 @@ export default function AdminOrders() {
                                     <th>Thanh toán</th>
                                     <th>Tổng tiền</th>
                                     <th>Trạng thái</th>
+                                    <th>Thao tác</th>
                                 </tr>
                                 </thead>
 
@@ -411,6 +456,21 @@ export default function AdminOrders() {
                                                     </small>
                                                 )}
                                             </td>
+
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="order-delete-button"
+                                                    disabled={isUpdating || id == null}
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        handleDeleteOrder(id);
+                                                    }}
+                                                >
+                                                    {isUpdating ? "Đang xử lý..." : "Xóa"}
+                                                </button>
+                                            </td>
+
                                         </tr>
                                     );
                                 })}

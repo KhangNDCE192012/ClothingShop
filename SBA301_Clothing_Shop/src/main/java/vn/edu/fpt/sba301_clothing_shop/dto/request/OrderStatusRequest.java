@@ -8,7 +8,7 @@ public class OrderStatusRequest {
 
     @NotBlank(message = "Trạng thái không được để trống")
     @Pattern(
-            regexp = "PENDING|CONFIRMED|SHIPPING|COMPLETED|CANCELLED",
+            regexp = "PENDING|CONFIRMED|SHIPPING|COMPLETED|CANCELLED|DELETE",
             message = "Trạng thái đơn hàng không hợp lệ"
     )
     private String status;
