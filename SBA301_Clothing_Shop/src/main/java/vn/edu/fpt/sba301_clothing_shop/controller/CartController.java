@@ -42,4 +42,16 @@ public class CartController {
         );
     }
 
+    @PutMapping
+    public ResponseEntity<Cart> changeQuantity(
+            Authentication authentication,
+            @Valid @RequestBody CartRequest request
+    ) {
+        String username = authentication.getName();
+
+        return ResponseEntity.ok(
+                cartService.updateQuantityChange(username, request)
+        );
+    }
+
 }

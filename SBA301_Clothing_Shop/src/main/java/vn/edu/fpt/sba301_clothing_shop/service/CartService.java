@@ -64,4 +64,31 @@ public class CartService {
 
         return cartRepository.findAllByUser_Id(userId);
     }
+
+    public Cart updateQuantityChange(String username, @Valid CartRequest request) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy người dùng")
+        );
+
+        Integer userId = user.getId();
+
+        Variant variant = variantRepository.findById(request.variantId()).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy biến thể sản phẩm")
+        );
+
+        Cart cart = cartRepository
+                .findByUser_IdAndVariant_Id(user.getId(), variant.getId())
+                .orElse(null);
+
+        if (cart == null) {
+            cart = new Cart();
+            cart.setUser(user);
+            cart.setVariant(variant);
+            cart.setQuantity(request.quantity());
+        }else {
+            cart.setQuantity(request.quantity());
+        }
+
+        return cartRepository.save(cart);
+    }
 }

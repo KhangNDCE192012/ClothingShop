@@ -71,3 +71,28 @@ export async function getMyCart() {
 
     return response.json();
 }
+
+export async function updateCartQuantity(variantId, quantity) {
+    const token = getAccessToken();
+
+    const response = await fetch(
+        API_URL,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                variantId,
+                quantity,
+            }),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Không thể cập nhật số lượng sản phẩm.");
+    }
+
+    return response.json();
+}

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getMyCart } from "../services/CartService";
 import { getAccessToken } from "../services/AuthService";
+import { updateCartQuantity } from "../services/CartService";
 import "../css/Cart.css";
 
 const formatPrice = (price) =>
@@ -16,6 +17,7 @@ export default function Cart() {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [updatingId, setUpdatingId] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -62,6 +64,28 @@ export default function Cart() {
     const getVariantId = (item) => {
         const variant = getVariant(item);
         return variant.id;
+    };
+
+    const handleQuantityChange = async (item, change) => {
+        const variantId = getVariantId(item);
+        const newQuantity = getQuantity(item) + change;
+
+        if (!variantId || newQuantity < 1 || updatingId !== null) {
+            return;
+        }
+
+        try {
+            setUpdatingId(variantId);
+
+            await updateCartQuantity(variantId, newQuantity);
+
+            const data = await getMyCart();
+            setItems(Array.isArray(data) ? data : data?.items ?? []);
+        } catch (err) {
+            setError(err.message || "Không thể cập nhật số lượng.");
+        } finally {
+            setUpdatingId(null);
+        }
     };
 
     const getProductName = (item) => {
@@ -227,7 +251,26 @@ export default function Cart() {
 
                                             <div className="cart-quantity">
                                                 <span>Số lượng:</span>
-                                                <strong>{quantity}</strong>
+
+                                                <div className="quantity-control">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleQuantityChange(item, -1)}
+                                                        disabled={quantity <= 1 || updatingId !== null}
+                                                    >
+                                                        −
+                                                    </button>
+
+                                                    <strong>{quantity}</strong>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleQuantityChange(item, 1)}
+                                                        disabled={updatingId !== null}
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
