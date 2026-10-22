@@ -28,6 +28,36 @@ export async function createOrder(payload) {
     return data;
 }
 
+export async function updateOrderStatus(id, status) {
+    const token = getAccessToken();
+
+    if (!token) {
+        throw new Error("Vui lòng đăng nhập lại.");
+    }
+
+    const response = await fetch(
+        `${ORDER_API}/manage/${id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ status }),
+        }
+    );
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || "Không tìm thấy đơn hàng"
+        );
+    }
+
+    return data;
+}
+
 export async function getAllOrders() {
     const token = getAccessToken();
 

@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.CheckoutRequest;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.OrderStatusRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.CheckoutResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.Order;
 import vn.edu.fpt.sba301_clothing_shop.entity.OrderDetail;
@@ -48,6 +49,11 @@ public class OrderController {
     @GetMapping("/manage/{id}")
     public ResponseEntity<List<OrderDetail>> getAllOrder(@PathVariable Integer id){
         return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
+    @PutMapping("/manage/{id}")
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable Integer id,@RequestBody OrderStatusRequest orderStatusRequest){
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, orderStatusRequest));
     }
 
 }

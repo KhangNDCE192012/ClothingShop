@@ -3,6 +3,7 @@ package vn.edu.fpt.sba301_clothing_shop.service;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.CheckoutRequest;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.OrderStatusRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.CheckoutResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.Order;
 import vn.edu.fpt.sba301_clothing_shop.entity.OrderDetail;
@@ -175,5 +176,14 @@ public class OrderService {
 
     public List<OrderDetail> getOrderById(Integer id) {
         return orderDetailRepository.findByOrder_Id(id);
+    }
+
+    public Order updateOrderStatus(Integer id, OrderStatusRequest orderStatusRequest) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
+                "Không tìm thấy Order ID: "
+                        + id));
+        String status = orderStatusRequest.getStatus();
+        order.setStatus(status);
+        return orderRepository.save(order);
     }
 }

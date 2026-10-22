@@ -1,8 +1,10 @@
 
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { getAllOrders } from "../services/OrderService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+    getAllOrders,
+    updateOrderStatus,
+} from "../services/OrderService";
 import "../css/AdminOrders.css";
 
 const formatPrice = (price) =>
@@ -22,24 +24,18 @@ const getCustomerName = (order) =>
     "Khách hàng";
 
 const getTotal = (order) =>
-    order.totalAmount ??
-    order.totalPrice ??
-    order.total ??
-    0;
+    order.totalAmount ?? order.totalPrice ?? order.total ?? 0;
 
 const getStatus = (order) =>
     String(order.status ?? "PENDING").toUpperCase();
 
-const statusLabels = {
-    PENDING: "Chờ xác nhận",
-    CONFIRMED: "Đã xác nhận",
-    PROCESSING: "Đang xử lý",
-    SHIPPING: "Đang giao",
-    DELIVERED: "Đã giao",
-    COMPLETED: "Hoàn thành",
-    CANCELLED: "Đã hủy",
-    PAID: "Đã thanh toán",
-};
+const editableStatuses = [
+    { value: "PENDING", label: "Pending" },
+    { value: "CONFIRMED", label: "Confirmed" },
+    { value: "SHIPPING", label: "Shipping" },
+    { value: "COMPLETED", label: "Completed" },
+    { value: "CANCELLED", label: "Cancelled" },
+];
 
 export default function AdminOrders() {
     const [orders, setOrders] = useState([]);
@@ -47,35 +43,50 @@ export default function AdminOrders() {
     const [error, setError] = useState("");
     const [keyword, setKeyword] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
+    const [updatingIds, setUpdatingIds] = useState([]);
+    const [updateMessage, setUpdateMessage] = useState("");
+    const [updateError, setUpdateError] = useState("");
+
     const navigate = useNavigate();
+
+
+    async function loadOrders() {
+        setLoading(true);
+        setError("");
+
+        try {
+            const data = await getAllOrders();
+            setOrders(data);
+        } catch (err) {
+            setError(
+                err.message || "Không thể tải danh sách đơn hàng."
+            );
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         let cancelled = false;
 
-        async function loadOrders() {
-            try {
-                setLoading(true);
-                setError("");
-
-                const data = await getAllOrders();
-
+        getAllOrders()
+            .then((data) => {
                 if (!cancelled) {
                     setOrders(data);
                 }
-            } catch (err) {
+            })
+            .catch((err) => {
                 if (!cancelled) {
                     setError(
                         err.message || "Không thể tải danh sách đơn hàng."
                     );
                 }
-            } finally {
+            })
+            .finally(() => {
                 if (!cancelled) {
                     setLoading(false);
                 }
-            }
-        }
-
-        loadOrders();
+            });
 
         return () => {
             cancelled = true;
@@ -88,7 +99,7 @@ export default function AdminOrders() {
 
         return orders.filter((order) => {
             const id = String(getOrderId(order) ?? "");
-            const customer = getCustomerName(order).toLowerCase();
+            const customer = String(getCustomerName(order)).toLowerCase();
             const status = getStatus(order);
 
             const matchesKeyword =
@@ -107,6 +118,69 @@ export default function AdminOrders() {
         0
     );
 
+    async function handleStatusChange(orderId, newStatus) {
+        if (orderId == null) return;
+
+        const idKey = String(orderId);
+
+        const currentOrder = orders.find(
+            (order) => String(getOrderId(order)) === idKey
+        );
+
+        if (
+            !currentOrder ||
+            getStatus(currentOrder) === newStatus ||
+            updatingIds.includes(idKey)
+        ) {
+            return;
+        }
+
+        const oldStatus = getStatus(currentOrder);
+
+        setUpdatingIds((previous) => [...previous, idKey]);
+        setUpdateMessage("");
+        setUpdateError("");
+
+        try {
+            await updateOrderStatus(orderId, newStatus);
+
+            setOrders((previousOrders) =>
+                previousOrders.map((order) =>
+                    String(getOrderId(order)) === idKey
+                        ? { ...order, status: newStatus }
+                        : order
+                )
+            );
+
+            const label =
+                editableStatuses.find(
+                    (item) => item.value === newStatus
+                )?.label ?? newStatus;
+
+            setUpdateMessage(
+                `Đã cập nhật đơn hàng #${orderId} thành ${label}.`
+            );
+        } catch (err) {
+            setUpdateError(
+                err.message || "Không thể cập nhật trạng thái đơn hàng."
+            );
+
+            // Không thay đổi orders khi API thất bại.
+            // Dropdown sẽ trở về trạng thái đang lưu.
+            setOrders((previousOrders) =>
+                previousOrders.map((order) =>
+                    String(getOrderId(order)) === idKey
+                        ? { ...order, status: oldStatus }
+                        : order
+                )
+            );
+        } finally {
+            setUpdatingIds((previous) =>
+                previous.filter((value) => value !== idKey)
+            );
+        }
+    }
+
     return (
         <main className="admin-orders-page">
             <div className="admin-orders-container">
@@ -121,18 +195,21 @@ export default function AdminOrders() {
                         <span className="admin-orders-eyebrow">
                             ADMINISTRATION
                         </span>
+
                         <h1>Quản lý đơn hàng</h1>
+
                         <p>
-                            Theo dõi và quản lý các đơn hàng của khách hàng.
+                            Theo dõi và cập nhật trạng thái đơn hàng của khách hàng.
                         </p>
                     </div>
 
                     <button
                         type="button"
                         className="admin-orders-refresh"
-                        onClick={() => window.location.reload()}
+                        onClick={loadOrders}
+                        disabled={loading}
                     >
-                        ↻ Làm mới
+                        ↻ {loading ? "Đang tải..." : "Làm mới"}
                     </button>
                 </header>
 
@@ -180,15 +257,29 @@ export default function AdminOrders() {
                             aria-label="Lọc trạng thái đơn hàng"
                         >
                             <option value="ALL">Tất cả trạng thái</option>
-                            {Object.entries(statusLabels).map(
-                                ([value, label]) => (
-                                    <option key={value} value={value}>
-                                        {label}
-                                    </option>
-                                )
-                            )}
+
+                            {editableStatuses.map((item) => (
+                                <option
+                                    key={item.value}
+                                    value={item.value}
+                                >
+                                    {item.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
+
+                    {updateMessage && (
+                        <p className="order-update-success" role="status">
+                            {updateMessage}
+                        </p>
+                    )}
+
+                    {updateError && (
+                        <p className="order-update-error" role="alert">
+                            {updateError}
+                        </p>
+                    )}
 
                     {loading ? (
                         <div className="admin-orders-message">
@@ -197,10 +288,8 @@ export default function AdminOrders() {
                     ) : error ? (
                         <div className="admin-orders-message error">
                             <p>{error}</p>
-                            <button
-                                type="button"
-                                onClick={() => window.location.reload()}
-                            >
+
+                            <button type="button" onClick={loadOrders}>
                                 Thử lại
                             </button>
                         </div>
@@ -226,6 +315,10 @@ export default function AdminOrders() {
                                 {filteredOrders.map((order, index) => {
                                     const id = getOrderId(order);
                                     const status = getStatus(order);
+                                    const idKey = String(id);
+                                    const isUpdating =
+                                        updatingIds.includes(idKey);
+
                                     const date =
                                         order.createdAt ??
                                         order.orderDate ??
@@ -235,7 +328,11 @@ export default function AdminOrders() {
                                         <tr
                                             key={id ?? index}
                                             className="admin-order-row"
-                                            onClick={() => navigate(`/admin/orders/${id}`)}
+                                            onClick={() =>
+                                                navigate(
+                                                    `/admin/orders/${id}`
+                                                )
+                                            }
                                             title={`Xem chi tiết đơn hàng #${id}`}
                                         >
                                             <td className="order-code">
@@ -259,8 +356,7 @@ export default function AdminOrders() {
                                             </td>
 
                                             <td>
-                                                {order.paymentMethod ??
-                                                    "—"}
+                                                {order.paymentMethod ?? "—"}
                                             </td>
 
                                             <td className="order-price">
@@ -268,12 +364,52 @@ export default function AdminOrders() {
                                             </td>
 
                                             <td>
-                                                    <span
-                                                        className={`order-status status-${status.toLowerCase()}`}
-                                                    >
-                                                        {statusLabels[status] ??
-                                                            status}
-                                                    </span>
+                                                <select
+                                                    className={`order-status-select status-${status.toLowerCase()}`}
+                                                    value={editableStatuses.some(
+                                                        (item) =>
+                                                            item.value === status
+                                                    )
+                                                        ? status
+                                                        : "PENDING"
+                                                    }
+                                                    disabled={
+                                                        isUpdating ||
+                                                        id == null
+                                                    }
+                                                    onClick={(event) =>
+                                                        event.stopPropagation()
+                                                    }
+                                                    onChange={(event) => {
+                                                        event.stopPropagation();
+
+                                                        handleStatusChange(
+                                                            id,
+                                                            event.target.value
+                                                        );
+                                                    }}
+                                                    onKeyDown={(event) =>
+                                                        event.stopPropagation()
+                                                    }
+                                                    aria-label={`Cập nhật trạng thái đơn hàng ${id}`}
+                                                >
+                                                    {editableStatuses.map(
+                                                        (item) => (
+                                                            <option
+                                                                key={item.value}
+                                                                value={item.value}
+                                                            >
+                                                                {item.label}
+                                                            </option>
+                                                        )
+                                                    )}
+                                                </select>
+
+                                                {isUpdating && (
+                                                    <small className="order-status-loading">
+                                                        Đang cập nhật...
+                                                    </small>
+                                                )}
                                             </td>
                                         </tr>
                                     );
