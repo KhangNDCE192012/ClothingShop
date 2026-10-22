@@ -28,4 +28,35 @@ export async function createOrder(payload) {
     return data;
 }
 
+export async function getAllOrders() {
+    const token = getAccessToken();
+
+    if (!token) {
+        throw new Error("Vui lòng đăng nhập lại.");
+    }
+
+    const response = await fetch(`${ORDER_API}/manage`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        if (response.status === 403) {
+            throw new Error("Bạn không có quyền xem danh sách đơn hàng.");
+        }
+
+        throw new Error(
+            `Không thể tải danh sách đơn hàng (HTTP ${response.status}).`
+        );
+    }
+
+    const data = await response.json();
+
+    return Array.isArray(data)
+        ? data
+        : data?.orders ?? data?.content ?? data?.data ?? [];
+}
+
 

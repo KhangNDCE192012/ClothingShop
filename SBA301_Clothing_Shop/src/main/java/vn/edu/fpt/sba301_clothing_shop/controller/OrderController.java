@@ -1,14 +1,19 @@
 package vn.edu.fpt.sba301_clothing_shop.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.CheckoutRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.CheckoutResponse;
+import vn.edu.fpt.sba301_clothing_shop.entity.Order;
 import vn.edu.fpt.sba301_clothing_shop.entity.User;
 import vn.edu.fpt.sba301_clothing_shop.service.OrderService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -32,6 +37,11 @@ public class OrderController {
                     "Không xác định được người dùng đăng nhập.");
         }
 
-        return orderService.checkout(username, request);
+        return orderService.checkout(username, request) ;
+    }
+
+    @GetMapping("/manage")
+    public ResponseEntity<List<Order>> getAllOrder(){
+        return ResponseEntity.ok(orderService.getAllOrder());
     }
 }

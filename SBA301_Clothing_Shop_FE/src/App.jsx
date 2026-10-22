@@ -8,6 +8,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import AuthHeader from "./components/AuthHeader";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import AdminOrders from "./pages/AdminOrders";
 
 function App() {
   return (
@@ -25,6 +26,14 @@ function App() {
                 <ProtectedRoute allowedRoles={["ADMIN"]}>
                   <AdminUsers />
                 </ProtectedRoute>
+              )}
+          />
+          <Route
+              path="/admin/orders"
+              element={(
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminOrders />
+                  </ProtectedRoute>
               )}
           />
         <Route path="*" element={<Navigate to="/" replace />} />

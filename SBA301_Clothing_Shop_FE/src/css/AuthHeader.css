@@ -1,35 +1,43 @@
+
 .auth-header {
     position: relative;
     z-index: 20;
-    min-height: 68px;
-    padding: 10px clamp(20px, 5vw, 72px);
+    min-height: 72px;
+    padding: 12px clamp(16px, 4vw, 64px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
     color: #17211c;
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.97);
     border-bottom: 1px solid #e8ebe9;
     box-shadow: 0 3px 18px rgba(18, 35, 27, 0.06);
+    box-sizing: border-box;
 }
 
-.auth-header-brand,
-.auth-header-actions,
-.auth-header-user {
-    display: flex;
-    align-items: center;
+.auth-header *,
+.auth-header *::before,
+.auth-header *::after {
+    box-sizing: border-box;
 }
 
+/* Logo */
 .auth-header-brand {
+    display: inline-flex;
+    align-items: center;
     gap: 11px;
+    flex-shrink: 0;
+    text-decoration: none;
+    color: #173f2c;
     letter-spacing: 0.02em;
 }
 
 .auth-header-brand > span {
-    width: 39px;
-    height: 39px;
+    width: 42px;
+    height: 42px;
     display: grid;
     place-items: center;
+    flex-shrink: 0;
     color: #fff;
     background: #173f2c;
     border-radius: 50%;
@@ -37,78 +45,217 @@
     font-weight: 800;
 }
 
+.auth-header-brand strong {
+    font-size: 19px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Navigation */
 .auth-header-actions {
-    gap: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px 22px;
     font-size: 14px;
 }
 
 .auth-header-actions > a:not(.auth-header-login) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
     color: #375548;
     font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
 }
 
-.auth-header-user {
-    align-items: flex-end;
-    flex-direction: column;
-    line-height: 1.2;
-    font-weight: 700;
+.auth-header-actions > a:not(.auth-header-login):hover {
+    color: #173f2c;
 }
 
-.auth-header-user small {
-    margin-top: 3px;
-    color: #7a8981;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-}
-
-.auth-header button,
-.auth-header-login {
-    padding: 9px 16px;
-    border: 1px solid #173f2c;
-    border-radius: 999px;
-    cursor: pointer;
-    color: #fff;
-    background: #173f2c;
-    font-weight: 700;
-    transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.auth-header button:hover,
-.auth-header-login:hover {
-    background: #235a40;
-    transform: translateY(-1px);
-}
-
-@media (max-width: 650px) {
-    .auth-header {
-        padding-inline: 16px;
-    }
-
-    .auth-header-brand strong,
-    .auth-header-user,
-    .auth-header-actions > a:not(.auth-header-login) {
-        display: none;
-    }
-}
-
+/* Cart */
 .auth-header-cart {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid #e0e8e2;
+    border-radius: 10px;
     text-decoration: none;
     color: #173f2e;
-    font-weight: 600;
+    background: #f8faf8;
+    font-weight: 700;
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
+}
+
+.auth-header-cart:hover {
+    background: #edf4ef;
+    border-color: #cbdacf;
+    transform: translateY(-1px);
 }
 
 .cart-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 22px;
-    height: 22px;
+    min-width: 23px;
+    height: 23px;
     padding: 0 6px;
-    border-radius: 50%;
+    border-radius: 999px;
     background: #173f2e;
-    color: white;
+    color: #fff;
     font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* User information */
+.auth-header-user {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.2;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.auth-header-user small {
+    color: #7a8981;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+}
+
+/* Logout and login */
+.auth-header button,
+.auth-header-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 17px;
+    border: 1px solid #173f2c;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #fff;
+    background: #173f2c;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.auth-header button:hover,
+.auth-header-login:hover {
+    color: #fff;
+    background: #235a40;
+    box-shadow: 0 4px 10px rgba(23, 63, 44, 0.14);
+    transform: translateY(-1px);
+}
+
+.auth-header button:focus-visible,
+.auth-header a:focus-visible {
+    outline: 2px solid #4f8c68;
+    outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .auth-header {
+        gap: 16px;
+        padding-inline: 20px;
+    }
+
+    .auth-header-actions {
+        gap: 10px 14px;
+    }
+
+    .auth-header-brand strong {
+        font-size: 17px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+    .auth-header {
+        min-height: 64px;
+        padding: 10px 14px;
+        gap: 12px;
+    }
+
+    .auth-header-brand {
+        gap: 8px;
+    }
+
+    .auth-header-brand > span {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+
+    .auth-header-brand strong {
+        display: none;
+    }
+
+    .auth-header-actions {
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .auth-header-user {
+        display: none;
+    }
+
+    .auth-header-actions > a:not(.auth-header-login) {
+        min-height: 34px;
+        font-size: 12px;
+    }
+
+    .auth-header-cart {
+        gap: 5px;
+        padding: 6px 8px;
+        border-radius: 8px;
+    }
+
+    .cart-count {
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        font-size: 11px;
+    }
+
+    .auth-header button,
+    .auth-header-login {
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 380px) {
+    .auth-header {
+        padding-inline: 10px;
+    }
+
+    .auth-header-actions {
+        gap: 6px;
+    }
+
+    .auth-header button,
+    .auth-header-login {
+        padding-inline: 9px;
+    }
 }

@@ -37,7 +37,7 @@ public class OrderService {
         this.cartRepository = cartRepository;
     }
 
-    @Transactional
+
     public CheckoutResponse checkout(
             String username,
             CheckoutRequest request) {
@@ -167,5 +167,9 @@ public class OrderService {
                 savedOrder.getOrderDate(),
                 "Đặt hàng thành công."
         );
+    }
+
+    public List<Order> getAllOrder() {
+        return orderRepository.findAll();
     }
 }

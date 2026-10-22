@@ -85,22 +85,33 @@ export default function AuthHeader() {
             >
                 {user ? (
                     <>
+
                         {user.role === "ADMIN" && (
-                            <Link to="/admin/users">
-                                Quản lý người dùng
-                            </Link>
+                            <>
+                                <Link to="/admin/users">
+                                    Quản lý người dùng
+                                </Link>
+
+                                <Link to="/admin/orders">
+                                    Quản lý đơn hàng
+                                </Link>
+                            </>
                         )}
 
-                        <Link
-                            to="/cart"
-                            className="auth-header-cart"
-                            aria-label={`Giỏ hàng, ${cartCount} sản phẩm`}
-                        >
-                            🛒 Giỏ hàng
-                            <span className="cart-count">
-                                {cartCount}
-                            </span>
-                        </Link>
+
+
+                        {user.role === "CUSTOMER" && (
+                            <Link
+                                to="/cart"
+                                className="auth-header-cart"
+                                aria-label={`Giỏ hàng, ${cartCount} sản phẩm`}
+                            >
+                                🛒 Giỏ hàng
+                                <span className="cart-count">
+            {cartCount}
+        </span>
+                            </Link>
+                        )}
 
                         <span className="auth-header-user">
                             {user.fullName || user.username}
