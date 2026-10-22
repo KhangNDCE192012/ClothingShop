@@ -1,7 +1,11 @@
 import {useEffect, useMemo, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import {getVariants} from "../services/ProductService";
+import {addToCart} from "../services/CartService.jsx";
 import "../css/ProductDetail.css";
+import { useNavigate } from "react-router-dom";
+import { getAccessToken } from "../services/AuthService";
+
 
 const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
@@ -12,12 +16,33 @@ const formatPrice = (price) =>
 
 export default function ProductDetail() {
     const {id} = useParams();
-
+    const navigate = useNavigate();
     const [variants, setVariants] = useState([]);
     const [selected, setSelected] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+
+    const handleAddToCart = async () => {
+        try {
+            const token = getAccessToken();
+
+            if (!token) {
+                navigate("/login");
+                return;
+            }
+
+            await addToCart(selected.id, quantity);
+
+            window.dispatchEvent(new Event("cartUpdated"));
+
+            alert("Đã thêm sản phẩm vào giỏ hàng!");
+        } catch (error) {
+            console.error("Lỗi thêm giỏ hàng:", error);
+            alert(error.message);
+        }
+    };
 
     useEffect(() => {
         let active = true;
@@ -279,11 +304,7 @@ export default function ProductDetail() {
                             type="button"
                             className="detail-add-cart"
                             disabled={stock <= 0}
-                            onClick={() =>
-                                alert(
-                                    `Đã chọn biến thể ID ${selected.id}, số lượng ${quantity}. Cần kết nối API giỏ hàng để lưu sản phẩm.`
-                                )
-                            }
+                            onClick={handleAddToCart}
                         >
                             ＋ &nbsp; THÊM VÀO GIỎ HÀNG
                         </button>

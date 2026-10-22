@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getCategories } from "../services/CategoryService";
 import "../css/CategorySection.css";
+import { useNavigate } from "react-router-dom";
 
 function CategorySection() {
 
+    const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -93,6 +95,7 @@ function CategorySection() {
                             <article
                                 className="category-card"
                                 key={category.id}
+                                onClick={() => navigate(`/products/${category.id}`)}
                             >
 
                                 <div className="category-card-image">
@@ -102,6 +105,7 @@ function CategorySection() {
                                         <img
                                             src={category.image}
                                             alt={category.name}
+                                            onClick={() => navigate(`/products/${category.id}`)}
                                         />
 
                                     ) : (

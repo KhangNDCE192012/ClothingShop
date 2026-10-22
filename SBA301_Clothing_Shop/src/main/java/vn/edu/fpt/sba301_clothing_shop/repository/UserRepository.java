@@ -29,4 +29,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Query(value = "DELETE FROM Carts WHERE user_id = :userId", nativeQuery = true)
     void deleteCartsByUserId(@Param("userId") Integer userId);
+
+    Optional<User> findByUsername(String username);
 }
