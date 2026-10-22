@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.CheckoutRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.CheckoutResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.Order;
+import vn.edu.fpt.sba301_clothing_shop.entity.OrderDetail;
 import vn.edu.fpt.sba301_clothing_shop.entity.User;
 import vn.edu.fpt.sba301_clothing_shop.service.OrderService;
 
@@ -44,4 +45,9 @@ public class OrderController {
     public ResponseEntity<List<Order>> getAllOrder(){
         return ResponseEntity.ok(orderService.getAllOrder());
     }
+    @GetMapping("/manage/{id}")
+    public ResponseEntity<List<OrderDetail>> getAllOrder(@PathVariable Integer id){
+        return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
 }

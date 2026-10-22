@@ -9,6 +9,7 @@ import AuthHeader from "./components/AuthHeader";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import AdminOrders from "./pages/AdminOrders";
+import AdminOrderDetail from "./pages/AdminOrderDetail";
 
 function App() {
   return (
@@ -33,6 +34,14 @@ function App() {
               element={(
                   <ProtectedRoute allowedRoles={["ADMIN"]}>
                       <AdminOrders />
+                  </ProtectedRoute>
+              )}
+          />
+          <Route
+              path="/admin/orders/:id"
+              element={(
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminOrderDetail />
                   </ProtectedRoute>
               )}
           />

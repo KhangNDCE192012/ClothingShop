@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllOrders } from "../services/OrderService";
+import { useNavigate } from "react-router-dom";
 import "../css/AdminOrders.css";
 
 const formatPrice = (price) =>
@@ -46,7 +47,7 @@ export default function AdminOrders() {
     const [error, setError] = useState("");
     const [keyword, setKeyword] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         let cancelled = false;
@@ -231,7 +232,12 @@ export default function AdminOrders() {
                                         order.created_at;
 
                                     return (
-                                        <tr key={id ?? index}>
+                                        <tr
+                                            key={id ?? index}
+                                            className="admin-order-row"
+                                            onClick={() => navigate(`/admin/orders/${id}`)}
+                                            title={`Xem chi tiết đơn hàng #${id}`}
+                                        >
                                             <td className="order-code">
                                                 #{id ?? "—"}
                                             </td>

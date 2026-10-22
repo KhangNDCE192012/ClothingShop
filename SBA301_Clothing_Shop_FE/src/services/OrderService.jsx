@@ -59,4 +59,30 @@ export async function getAllOrders() {
         : data?.orders ?? data?.content ?? data?.data ?? [];
 }
 
+export async function getOrderById(id) {
+    const token = getAccessToken();
 
+    const response = await fetch(
+        `${ORDER_API}/manage/${id}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+
+        }
+    );
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || "Không tìm thấy đơn hàng"
+        );
+    }
+
+    return Array.isArray(data)
+        ? data
+        : data?.orders ?? data?.content ?? data?.data ?? [];
+}
