@@ -28,7 +28,7 @@ public class ProductController {
             @PathVariable Integer id
     ) {
         List<VariantResponse> listVariant =
-                variantService.getVariantsByProductId(id);;
+                variantService.getVariantsByProductId(id);
 
         return ResponseEntity.ok(listVariant);
     }

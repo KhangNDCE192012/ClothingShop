@@ -1,5 +1,6 @@
 package vn.edu.fpt.sba301_clothing_shop.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,6 +25,7 @@ public class User {
     private String username;
 
     @Column(nullable = false, length = 255)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false, unique = true, length = 100)

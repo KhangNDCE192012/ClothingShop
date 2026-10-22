@@ -68,7 +68,7 @@ export default function Cart() {
         const variant = getVariant(item);
 
         return (
-            variant.product.name
+            variant?.product?.name || "Sản phẩm"
         );
     };
 
@@ -76,14 +76,14 @@ export default function Cart() {
         const variant = getVariant(item);
 
         return (
-            variant.image ??
+            variant?.image ??
             ""
         );
     };
 
     const getPrice = (item) => {
         const variant = getVariant(item);
-        return Number(variant.price ?? item.price ?? 0);
+        return Number(variant?.price ?? item?.price ?? 0);
     };
 
     const getQuantity = (item) => Number(item.quantity ?? 0);
@@ -181,13 +181,13 @@ export default function Cart() {
                                     >
                                         <Link
                                             to={
-                                                variant.product?.id
+                                                variant?.product?.id
                                                     ? `/products/${variant.product.id}`
                                                     : "#"
                                             }
                                             className="cart-product-image"
                                             onClick={(event) => {
-                                                if (!variant.product?.id) {
+                                                if (!variant?.product?.id) {
                                                     event.preventDefault();
                                                 }
                                             }}
@@ -285,17 +285,9 @@ export default function Cart() {
                                 <strong>{formatPrice(subtotal)}</strong>
                             </div>
 
-                            <button
-                                type="button"
-                                className="cart-checkout-button"
-                                onClick={() => {
-                                    alert(
-                                        "Chức năng thanh toán sẽ được tích hợp sau."
-                                    );
-                                }}
-                            >
+                            <Link to="/checkout" className="cart-checkout-button">
                                 TIẾN HÀNH THANH TOÁN
-                            </button>
+                            </Link>
 
                             <p className="cart-summary-note">
                                 Phí vận chuyển và ưu đãi sẽ được xác nhận

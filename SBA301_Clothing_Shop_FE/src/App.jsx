@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import AuthHeader from "./components/AuthHeader";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <AuthHeader />
       <Routes>
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/products/:id" element={<ProductDetail />} />

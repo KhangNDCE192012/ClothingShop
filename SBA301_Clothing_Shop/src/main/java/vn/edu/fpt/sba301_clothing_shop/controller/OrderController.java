@@ -1,0 +1,37 @@
+package vn.edu.fpt.sba301_clothing_shop.controller;
+
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.CheckoutRequest;
+import vn.edu.fpt.sba301_clothing_shop.dto.response.CheckoutResponse;
+import vn.edu.fpt.sba301_clothing_shop.entity.User;
+import vn.edu.fpt.sba301_clothing_shop.service.OrderService;
+
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping("/checkout")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CheckoutResponse checkout(
+            Authentication authentication,
+            @Valid @RequestBody CheckoutRequest request) {
+
+        String username = authentication.getName();
+        if (username == null) {
+            throw new IllegalStateException(
+                    "Không xác định được người dùng đăng nhập.");
+        }
+
+        return orderService.checkout(username, request);
+    }
+}

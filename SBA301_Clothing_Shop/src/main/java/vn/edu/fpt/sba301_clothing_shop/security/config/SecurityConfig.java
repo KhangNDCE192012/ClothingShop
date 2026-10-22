@@ -58,19 +58,23 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login","/api/carts/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**", "/api/categories", "/api/categories/**", "/api/carts/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products","/api/users/**", "/api/products/**", "/api/categories", "/api/categories/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/carts", "/api/carts/**").authenticated()
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, exception) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding("UTF-8");
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
                             response.getWriter().write("{\"message\":\"Bạn cần đăng nhập để sử dụng chức năng này\"}");
                         })
                         .accessDeniedHandler((request, response, exception) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding("UTF-8");
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
                             response.getWriter().write("{\"message\":\"Bạn không có quyền thực hiện thao tác này\"}");
                         }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

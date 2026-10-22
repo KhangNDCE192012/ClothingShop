@@ -390,3 +390,13 @@
         font-size: 9px;
     }
 }
+
+.cart-checkout-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    text-decoration: none;
+    text-align: center;
+}

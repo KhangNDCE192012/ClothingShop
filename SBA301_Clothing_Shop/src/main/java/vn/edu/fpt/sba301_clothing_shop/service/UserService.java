@@ -64,4 +64,14 @@ public class UserService {
                         "Không tìm thấy tài khoản customer với ID: " + id
                 ));
     }
+
+    public User getInforUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy người dùng")
+        );
+
+        Integer userId = user.getId();
+
+        return userRepository.findById(userId).orElse(null);
+    }
 }
