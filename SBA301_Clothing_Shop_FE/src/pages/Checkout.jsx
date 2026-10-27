@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMyCart } from "../services/CartService";
 import { getAccessToken } from "../services/AuthService";
@@ -55,14 +55,9 @@ export default function Checkout() {
         getVariant(item)?.imageUrl ??
         "";
 
-    const subtotal = useMemo(
-        () =>
-            items.reduce(
-                (sum, item) =>
-                    sum + getPrice(item) * getQuantity(item),
-                0
-            ),
-        [items]
+    const subtotal = items.reduce(
+        (sum, item) => sum + getPrice(item) * getQuantity(item),
+        0
     );
 
     // Chính sách phí vận chuyển mẫu.

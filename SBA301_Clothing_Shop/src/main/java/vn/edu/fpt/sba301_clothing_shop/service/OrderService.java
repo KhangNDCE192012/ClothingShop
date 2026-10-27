@@ -39,6 +39,7 @@ public class OrderService {
     }
 
 
+    @Transactional
     public CheckoutResponse checkout(
             String username,
             CheckoutRequest request) {
