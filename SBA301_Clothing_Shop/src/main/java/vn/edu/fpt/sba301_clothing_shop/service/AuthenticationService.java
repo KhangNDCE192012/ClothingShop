@@ -7,6 +7,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,20 +25,23 @@ public class AuthenticationService {
     private final CustomUserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthenticationService(
             AuthenticationManager authenticationManager,
             CustomUserDetailsService userDetailsService,
             UserRepository userRepository,
-            JwtService jwtService
+            JwtService jwtService,
+            PasswordEncoder passwordEncoder
     ) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         String username = request.username().trim();
 
@@ -61,6 +65,13 @@ public class AuthenticationService {
 
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(this::invalidCredentials);
+
+        // Nâng cấp mật khẩu sang BCrypt nếu tài khoản vẫn đang dùng mật khẩu cũ (plain text)
+        if (passwordEncoder.upgradeEncoding(user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(request.password()));
+            userRepository.save(user);
+        }
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String role = user.getRole().getName().toUpperCase();
         String token = jwtService.generateToken(userDetails, role);
