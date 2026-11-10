@@ -2,7 +2,7 @@ import {getAccessToken} from "./AuthService";
 
 /*
  * Nguyen Duy Khang - CE192012
- * Gọi API sản phẩm cho Home BL-003, điều hướng BL-005 và quản lý BL-006.
+ * Gọi API sản phẩm cho BL-003, BL-005, BL-006 và chi tiết BL-011.
  */
 const API_URL = "http://localhost:8080/api/products";
 
@@ -32,7 +32,8 @@ export async function getProducts() {
     return response.json();
 }
 
-export async function getVariants(productId) {
+/** Gọi BL-011 và trả về object Product đầy đủ theo ID. */
+export async function getProductById(productId) {
     const response = await fetch(`${API_URL}/${productId}`);
 
     if (!response.ok) {
@@ -40,4 +41,12 @@ export async function getVariants(productId) {
     }
 
     return response.json();
+}
+
+/**
+ * Adapter giữ tương thích với trang ProductDetail hiện có sau khi BL-011 đổi response.
+ */
+export async function getVariants(productId) {
+    const product = await getProductById(productId);
+    return Array.isArray(product?.variants) ? product.variants : [];
 }
