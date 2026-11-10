@@ -1,0 +1,151 @@
+/*
+ * Nguyen Duy Khang - CE192012
+ * Giao diện responsive cho khu vực sản phẩm nổi bật BL-003/BL-005.
+ */
+.featured-products {
+    padding: 84px 24px;
+    background: #fff;
+    color: #1f2933;
+}
+
+.featured-products-container {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+}
+
+.featured-products-heading {
+    max-width: 650px;
+    margin: 0 auto 38px;
+    text-align: center;
+}
+
+.featured-products-heading p {
+    margin: 0 0 10px;
+    color: #b45309;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.featured-products-heading h2 {
+    margin: 0 0 10px;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.featured-products-heading span,
+.featured-products-state {
+    color: #64748b;
+}
+
+.featured-products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.featured-product-card {
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.featured-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+}
+
+.featured-product-card > a {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.featured-product-image {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.featured-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.featured-product-card:hover img {
+    transform: scale(1.04);
+}
+
+.featured-product-image > div {
+    display: grid;
+    height: 100%;
+    place-items: center;
+    color: #94a3b8;
+}
+
+.featured-product-image > span {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    border-radius: 999px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.92);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.featured-product-content {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 17px;
+}
+
+.featured-product-content h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.featured-product-content strong {
+    color: #b45309;
+}
+
+.featured-product-link {
+    margin-top: 4px;
+    color: #475569;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.featured-products-state {
+    padding: 42px 20px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.featured-products-state.error {
+    color: #b91c1c;
+}
+
+@media (max-width: 980px) {
+    .featured-products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .featured-products {
+        padding: 58px 16px;
+    }
+
+    .featured-products-grid {
+        grid-template-columns: 1fr;
+    }
+}

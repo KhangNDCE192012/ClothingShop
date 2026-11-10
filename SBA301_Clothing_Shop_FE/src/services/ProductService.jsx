@@ -2,22 +2,18 @@ import {getAccessToken} from "./AuthService";
 
 /*
  * Nguyen Duy Khang - CE192012
- * Gọi các API sản phẩm; BL-006 dùng getProducts để ADMIN tải danh sách quản lý.
+ * Gọi API sản phẩm cho Home BL-003, điều hướng BL-005 và quản lý BL-006.
  */
 const API_URL = "http://localhost:8080/api/products";
 
 /**
- * Gọi GET /api/products kèm JWT vì backend chỉ cho phép ADMIN truy cập.
+ * Gọi GET /api/products. Token là tùy chọn vì Home được truy cập công khai.
  */
 export async function getProducts() {
     const token = getAccessToken();
 
-    if (!token) {
-        throw new Error("Bạn chưa đăng nhập. Vui lòng đăng nhập lại.");
-    }
-
     const response = await fetch(API_URL, {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: token ? {Authorization: `Bearer ${token}`} : {},
     });
 
     if (!response.ok) {
