@@ -10,6 +10,8 @@ import vn.edu.fpt.sba301_clothing_shop.entity.Category;
 import vn.edu.fpt.sba301_clothing_shop.entity.Product;
 import vn.edu.fpt.sba301_clothing_shop.entity.Variant;
 import vn.edu.fpt.sba301_clothing_shop.repository.CategoryRepository;
+import vn.edu.fpt.sba301_clothing_shop.repository.CartRepository;
+import vn.edu.fpt.sba301_clothing_shop.repository.OrderDetailRepository;
 import vn.edu.fpt.sba301_clothing_shop.repository.ProductRepository;
 import vn.edu.fpt.sba301_clothing_shop.repository.VariantRepository;
 
@@ -25,7 +27,7 @@ import java.util.Objects;
 
 /**
  * Nguyen Duy Khang
- * Xử lý nghiệp vụ đọc, tạo và chỉnh sửa Product trong Product Management/Home.
+ * Xử lý đọc, tạo, sửa và xóa sản phẩm trong Product Management/Home.
  */
 @Service
 public class ProductService {
@@ -33,15 +35,21 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final VariantRepository variantRepository;
     private final CategoryRepository categoryRepository;
+    private final CartRepository cartRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     public ProductService(
             ProductRepository productRepository,
             VariantRepository variantRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            CartRepository cartRepository,
+            OrderDetailRepository orderDetailRepository
     ) {
         this.productRepository = productRepository;
         this.variantRepository = variantRepository;
         this.categoryRepository = categoryRepository;
+        this.cartRepository = cartRepository;
+        this.orderDetailRepository = orderDetailRepository;
     }
 
     /**
@@ -145,6 +153,21 @@ public class ProductService {
         );
     }
 
+    /** BL-009: xóa sản phẩm và dữ liệu phụ thuộc nếu chưa có đơn hàng. */
+    @Transactional
+    public void deleteProduct(Integer id) {
+        Product product = findProduct(id);
+        if (orderDetailRepository.existsByVariant_Product_Id(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Không thể xóa sản phẩm đã có trong đơn hàng");
+        }
+
+        // Xóa giỏ hàng trước biến thể để không vi phạm khóa ngoại.
+        cartRepository.deleteAll(cartRepository.findAllByVariant_Product_Id(id));
+        variantRepository.deleteAll(variantRepository.findAllByProduct_Id(id));
+        productRepository.delete(product);
+    }
+
     /** Chỉ các trường cho phép sửa được gán vào Variant. */
     private Variant fillVariant(Variant variant, Product product, VariantCreateRequest item) {
         variant.setProduct(product);
@@ -174,7 +197,7 @@ public class ProductService {
         return ProductDetailResponse.from(product, variants);
     }
 
-    /** Kiểm tra ID và trả Product kèm Category để dùng chung cho BL-008/BL-011. */
+    /** Kiểm tra ID và tìm Product cho các thao tác đọc, sửa, xóa. */
     private Product findProduct(Integer id) {
         if (id == null || id <= 0) {
             throw new ResponseStatusException(

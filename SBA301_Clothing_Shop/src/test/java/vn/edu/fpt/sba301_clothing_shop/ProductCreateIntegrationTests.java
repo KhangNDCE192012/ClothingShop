@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Nguyen Duy Khang
- * Kiểm tra tạo, sửa sản phẩm và cập nhật tồn kho; dữ liệu test được rollback.
+ * Kiểm tra tạo, sửa, xóa sản phẩm và tồn kho; dữ liệu test được rollback.
  */
 @SpringBootTest
 @Transactional
@@ -100,5 +100,23 @@ class ProductCreateIntegrationTests {
         assertEquals(variantId, after.variants().getFirst().id());
         assertEquals(0, after.variants().getFirst().quantity());
         assertEquals(before.createdAt(), after.createdAt());
+    }
+
+    @Test
+    void deleteRemovesOnlyRequestedProductAndItsVariants() {
+        Integer categoryId = categoryRepository.findAll().getFirst().getId();
+        var request = new ProductCreateRequest("Delete test", categoryId, "ACTIVE",
+                List.of(new VariantCreateRequest("M", "Blue", "https://example.com/delete.jpg",
+                        2, new BigDecimal("100000"))));
+        var removed = productService.createProduct(request);
+        var retained = productService.createProduct(request);
+
+        productService.deleteProduct(removed.id());
+
+        assertTrue(productService.getAllProducts().stream()
+                .noneMatch(item -> item.id().equals(removed.id())));
+        assertNotNull(productService.getProductById(retained.id()));
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> productService.getProductById(removed.id()));
     }
 }

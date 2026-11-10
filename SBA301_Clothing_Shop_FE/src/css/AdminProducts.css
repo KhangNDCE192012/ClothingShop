@@ -1,6 +1,6 @@
 /*
  * Nguyen Duy Khang
- * Giao diện Product BL-006/BL-007/BL-008 và Category Management BL-012.
+ * Giao diện quản lý sản phẩm BL-006 đến BL-010 và danh mục BL-012.
  */
 .admin-products-page {
     min-height: calc(100vh - 72px);
@@ -369,6 +369,71 @@
     font-weight: 700;
     cursor: pointer;
 }
+
+.product-delete-button {
+    margin-left: 8px;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #b91c1c;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.product-delete-button:disabled { opacity: .6; cursor: wait; }
+.product-action-success, .product-action-error { margin: 14px 18px; font-weight: 700; }
+.product-action-success { color: #166534; }
+.product-action-error { color: #b91c1c; }
+
+/* Hộp xác nhận xóa nằm giữa màn hình và nổi trên trang quản trị. */
+.product-delete-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, .62);
+}
+
+.product-delete-dialog {
+    width: min(440px, 100%);
+    padding: 30px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .25);
+    text-align: center;
+}
+
+.product-delete-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.product-delete-dialog h2 { margin: 0 0 10px; font-size: 1.35rem; }
+.product-delete-dialog p { margin: 0; color: #475569; line-height: 1.6; }
+.product-delete-dialog strong { display: block; color: #17212b; overflow-wrap: anywhere; }
+.product-delete-actions { display: flex; gap: 10px; margin-top: 26px; }
+.product-delete-actions button {
+    flex: 1;
+    min-height: 44px;
+    border: 0;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.product-delete-actions button:first-child { background: #e2e8f0; color: #334155; }
+.product-delete-actions button:last-child { background: #b91c1c; color: #fff; }
+.product-delete-actions button:disabled { opacity: .6; cursor: wait; }
 
 .admin-products-message {
     padding: 52px 20px;

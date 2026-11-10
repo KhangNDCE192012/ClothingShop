@@ -19,6 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import vn.edu.fpt.sba301_clothing_shop.security.JwtAuthenticationFilter;
 import vn.edu.fpt.sba301_clothing_shop.security.LegacyCompatiblePasswordEncoder;
 
+/**
+ * Nguyen Duy Khang
+ * Cấu hình quyền truy cập API và xác thực JWT.
+ */
 @Configuration
 public class SecurityConfig {
 
@@ -66,6 +70,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         // Nguyen Duy Khang - BL-008: chỉ ADMIN được chỉnh sửa Product.
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        // BL-009: chỉ ADMIN được xóa sản phẩm.
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
                         // BL-012: các thao tác thay đổi Category chỉ dành cho ADMIN.
                         .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")

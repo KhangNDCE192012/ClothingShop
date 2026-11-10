@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Nguyen Duy Khang
- * Cung cấp API đọc, tạo và chỉnh sửa Product cho Product Management/Home.
+ * Cung cấp API đọc, tạo, sửa và xóa sản phẩm.
  */
 @RestController
 @RequestMapping("/api/products")
@@ -63,5 +63,12 @@ public class ProductController {
             @Valid @RequestBody ProductCreateRequest request
     ) {
         return ResponseEntity.ok(productService.updateProduct(id, request));
+    }
+
+    /** BL-009: xóa đúng sản phẩm theo ID và trả HTTP 204. */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }

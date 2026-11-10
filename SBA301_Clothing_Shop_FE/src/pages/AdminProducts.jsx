@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {Link} from "react-router-dom";
-import {getProducts} from "../services/ProductService";
+import {deleteProduct, getProducts} from "../services/ProductService";
 import {
     createCategory,
     deleteCategory,
@@ -11,7 +11,7 @@ import "../css/AdminProducts.css";
 
 /*
  * Nguyen Duy Khang
- * Trang quản lý Product BL-006/BL-007/BL-008 và Category BL-012 dành cho ADMIN.
+ * Trang quản lý sản phẩm BL-006 đến BL-010 và danh mục BL-012 cho ADMIN.
  */
 export default function AdminProducts() {
     // State lưu dữ liệu từ backend và trạng thái hiển thị của trang.
@@ -20,6 +20,11 @@ export default function AdminProducts() {
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [productMessage, setProductMessage] = useState("");
+    const [productError, setProductError] = useState("");
+    const [deletingProductId, setDeletingProductId] = useState(null);
+    const [productToDelete, setProductToDelete] = useState(null);
+    const cancelDeleteRef = useRef(null);
     const [categories, setCategories] = useState([]);
     const [categoryName, setCategoryName] = useState("");
     const [editingCategoryId, setEditingCategoryId] = useState(null);
@@ -40,6 +45,35 @@ export default function AdminProducts() {
             setError(requestError.message || "Đã xảy ra lỗi khi tải sản phẩm.");
         } finally {
             setLoading(false);
+        }
+    }
+
+    // Đưa focus vào hộp xác nhận; phím Escape đóng hộp khi chưa gửi yêu cầu.
+    useEffect(() => {
+        if (!productToDelete) return;
+        cancelDeleteRef.current?.focus();
+        const onKeyDown = (event) => {
+            if (event.key === "Escape" && deletingProductId === null) setProductToDelete(null);
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [productToDelete, deletingProductId]);
+
+    /** Xóa theo ID sau xác nhận; chỉ cập nhật danh sách khi API thành công. */
+    async function handleDeleteProduct(product) {
+        setDeletingProductId(product.id);
+        setProductError("");
+        setProductMessage("");
+        try {
+            await deleteProduct(product.id);
+            setProducts((current) => current.filter((item) => item.id !== product.id));
+            setProductMessage(`Đã xóa sản phẩm #${product.id}.`);
+            setProductToDelete(null);
+        } catch (requestError) {
+            setProductError(requestError.message || "Không thể xóa sản phẩm.");
+            setProductToDelete(null);
+        } finally {
+            setDeletingProductId(null);
         }
     }
 
@@ -264,6 +298,8 @@ export default function AdminProducts() {
                 </section>
 
                 <section className="admin-products-card">
+                    {productMessage && <p className="product-action-success" role="status">{productMessage}</p>}
+                    {productError && <p className="product-action-error" role="alert">{productError}</p>}
                     <div className="admin-products-toolbar">
                         <input
                             type="search"
@@ -326,6 +362,11 @@ export default function AdminProducts() {
                                             >
                                                 Chỉnh sửa
                                             </Link>
+                                            <button type="button" className="product-delete-button"
+                                                disabled={deletingProductId !== null}
+                                                onClick={() => setProductToDelete(product)}>
+                                                {deletingProductId === product.id ? "Đang xóa..." : "Xóa"}
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -341,6 +382,30 @@ export default function AdminProducts() {
                     )}
                 </section>
             </section>
+            {productToDelete && (
+                <div className="product-delete-backdrop" onMouseDown={() => {
+                    if (deletingProductId === null) setProductToDelete(null);
+                }}>
+                    <div className="product-delete-dialog" role="alertdialog" aria-modal="true"
+                        aria-labelledby="delete-product-title" aria-describedby="delete-product-description"
+                        onMouseDown={(event) => event.stopPropagation()}>
+                        <div className="product-delete-icon" aria-hidden="true">!</div>
+                        <h2 id="delete-product-title">Xác nhận xóa sản phẩm</h2>
+                        <p id="delete-product-description">
+                            Bạn có chắc muốn xóa <strong>#{productToDelete.id} · {productToDelete.name}</strong>?
+                            Sản phẩm và các biến thể sẽ không còn trong danh sách.
+                        </p>
+                        <div className="product-delete-actions">
+                            <button type="button" ref={cancelDeleteRef} disabled={deletingProductId !== null}
+                                onClick={() => setProductToDelete(null)}>Hủy</button>
+                            <button type="button" disabled={deletingProductId !== null}
+                                onClick={() => handleDeleteProduct(productToDelete)}>
+                                {deletingProductId === productToDelete.id ? "Đang xóa..." : "Xóa sản phẩm"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
