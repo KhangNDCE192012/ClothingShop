@@ -31,4 +31,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     void deleteCartsByUserId(@Param("userId") Integer userId);
 
     Optional<User> findByUsername(String username);
+
+    boolean existsByUsernameIgnoreCase(String username);
+
+    boolean existsByEmailIgnoreCase(String email);
 }

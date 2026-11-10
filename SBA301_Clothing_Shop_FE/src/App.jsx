@@ -4,6 +4,7 @@ import ProductDetail from "./pages/ProductDetail";
 import AdminUsers from "./pages/AdminUsers";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import AuthHeader from "./components/AuthHeader";
 import Cart from "./pages/Cart";
@@ -28,6 +29,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/categories/:id" element={<CategoryProducts />} />
           <Route

@@ -38,6 +38,20 @@ export async function login(username, password) {
     return session;
 }
 
+export async function register(payload) {
+    const response = await fetch(`${AUTH_API_URL}/register`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        throw new Error(await readError(response, "Đăng ký không thành công"));
+    }
+
+    return await response.json();
+}
+
 export function getSession() {
     try {
         const value = localStorage.getItem(AUTH_STORAGE_KEY);

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Navigate, useLocation, useNavigate} from "react-router-dom";
+import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import useAuth from "../auth/useAuth";
 import "../css/Login.css";
 
@@ -10,6 +10,7 @@ export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [successMessage] = useState(location.state?.message || "");
     const [submitting, setSubmitting] = useState(false);
 
     if (user) {
@@ -41,6 +42,8 @@ export default function Login() {
                 <p className="login-eyebrow">CLOTHING SHOP</p>
                 <h1 id="login-title">Chào mừng trở lại</h1>
                 <p className="login-description">Đăng nhập để tiếp tục sử dụng tài khoản của bạn.</p>
+
+                {successMessage && <div className="login-success" role="status">{successMessage}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <label>
@@ -77,6 +80,10 @@ export default function Login() {
                         {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
                     </button>
                 </form>
+
+                <p className="login-switch">
+                    Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+                </p>
             </section>
         </main>
     );

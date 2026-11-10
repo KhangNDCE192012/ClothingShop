@@ -131,12 +131,20 @@ export default function AuthHeader() {
                         </button>
                     </>
                 ) : (
-                    <Link
-                        className="auth-header-login"
-                        to="/login"
-                    >
-                        Đăng nhập
-                    </Link>
+                    <>
+                        <Link
+                            className="auth-header-login"
+                            to="/login"
+                        >
+                            Đăng nhập
+                        </Link>
+                        <Link
+                            className="auth-header-register"
+                            to="/register"
+                        >
+                            Đăng ký
+                        </Link>
+                    </>
                 )}
             </nav>
         </header>

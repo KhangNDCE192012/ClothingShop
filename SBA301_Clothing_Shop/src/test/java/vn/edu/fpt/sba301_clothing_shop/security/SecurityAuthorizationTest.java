@@ -4,15 +4,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.web.server.ResponseStatusException;
 import vn.edu.fpt.sba301_clothing_shop.controller.*;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.CheckoutRequest;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.RegisterRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.CheckoutResponse;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.UserResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.User;
@@ -23,10 +27,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,6 +42,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 @WebMvcTest({
+        AuthController.class,
         UserController.class,
         OrderController.class,
         CartController.class,
@@ -54,6 +61,9 @@ class SecurityAuthorizationTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
+
+    @MockitoBean
+    private AuthenticationService authenticationService;
 
     @MockitoBean
     private UserService userService;
@@ -328,6 +338,65 @@ class SecurityAuthorizationTest {
                     .andExpect(status().isForbidden());
             mockMvc.perform(delete("/api/categories/1").with(user("admin").roles("ADMIN")))
                     .andExpect(isNot401Or403());
+        }
+    }
+
+    @Nested
+    @DisplayName("BL-023: Register API Authorization")
+    class RegisterAuthorizationTests {
+
+        @Test
+        @DisplayName("POST /api/auth/register - 201 unauthenticated (không cần token), 400 khi thiếu trường, bỏ qua role=ADMIN")
+        void testRegisterAuthorization() throws Exception {
+            String validJson = """
+                    {
+                      "username": "customer123",
+                      "password": "Password123",
+                      "email": "customer123@example.com",
+                      "fullName": "Test Customer",
+                      "phone": "0912345678"
+                    }
+                    """;
+
+            when(authenticationService.register(any(RegisterRequest.class))).thenReturn(
+                    new UserResponse(10, "customer123", "customer123@example.com", "Test Customer", "0912345678", "CUSTOMER", "ACTIVE", LocalDateTime.now())
+            );
+
+            // 1. Không token -> 201 Created (không bị 401/403)
+            mockMvc.perform(post("/api/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(validJson))
+                    .andExpect(isNot401Or403())
+                    .andExpect(status().isCreated());
+
+            // 2. Thiếu trường -> 400 Bad Request
+            when(authenticationService.register(org.mockito.ArgumentMatchers.argThat(r -> r == null || r.username() == null)))
+                    .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username không được để trống"));
+
+            mockMvc.perform(post("/api/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{}"))
+                    .andExpect(status().isBadRequest());
+
+            // 3. Client gửi kèm role: "ADMIN" -> RegisterRequest không có trường role, service vẫn nhận dữ liệu hợp lệ
+            String hackerJson = """
+                    {
+                      "username": "customer123",
+                      "password": "Password123",
+                      "email": "customer123@example.com",
+                      "role": "ADMIN"
+                    }
+                    """;
+
+            mockMvc.perform(post("/api/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(hackerJson))
+                    .andExpect(status().isCreated());
+
+            ArgumentCaptor<RegisterRequest> captor = ArgumentCaptor.forClass(RegisterRequest.class);
+            verify(authenticationService, org.mockito.Mockito.atLeastOnce()).register(captor.capture());
+            RegisterRequest captured = captor.getValue();
+            assertEquals("customer123", captured.username());
         }
     }
 }

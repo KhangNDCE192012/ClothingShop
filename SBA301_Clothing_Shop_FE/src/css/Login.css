@@ -114,6 +114,35 @@
     line-height: 1.45;
 }
 
+.login-success {
+    padding: 11px 13px;
+    margin-bottom: 18px;
+    color: #1b5e20;
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 9px;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.login-switch {
+    margin-top: 24px;
+    text-align: center;
+    color: #68756f;
+    font-size: 14px;
+}
+
+.login-switch a {
+    color: #173f2c;
+    font-weight: 700;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.login-switch a:hover {
+    color: #2c6b4b;
+}
+
 @media (max-width: 520px) {
     .login-page {
         align-items: start;

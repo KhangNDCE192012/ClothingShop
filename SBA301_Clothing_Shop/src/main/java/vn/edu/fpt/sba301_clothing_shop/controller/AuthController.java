@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.LoginRequest;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.RegisterRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.AuthResponse;
+import vn.edu.fpt.sba301_clothing_shop.dto.response.UserResponse;
 import vn.edu.fpt.sba301_clothing_shop.service.AuthenticationService;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,5 +26,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(@RequestBody(required = false) RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(authenticationService.register(request));
     }
 }
