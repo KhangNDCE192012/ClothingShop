@@ -2,11 +2,17 @@ import {getAccessToken} from "./AuthService";
 
 const API_URL = "http://localhost:8080/api/users";
 
+/**
+ * Trả về header Authorization chứa Bearer token nếu người dùng đã đăng nhập.
+ */
 function authHeaders() {
     const token = getAccessToken();
     return token ? {Authorization: `Bearer ${token}`} : {};
 }
 
+/**
+ * Xử lý và ném lỗi từ phản hồi của API backend dạng tiếng Việt.
+ */
 async function throwResponseError(response, fallbackMessage) {
     let message = fallbackMessage;
 
@@ -20,6 +26,13 @@ async function throwResponseError(response, fallbackMessage) {
     throw new Error(`${message} (HTTP ${response.status})`);
 }
 
+/**
+ * BL-031: Lấy danh sách toàn bộ khách hàng dành cho Admin.
+ * Endpoint: GET /api/users
+ * Yêu cầu quyền: ADMIN
+ *
+ * @returns {Promise<Array>} Danh sách các khách hàng dạng UserResponse
+ */
 export async function getCustomers() {
     const response = await fetch(API_URL, {headers: authHeaders()});
 
@@ -30,6 +43,14 @@ export async function getCustomers() {
     return response.json();
 }
 
+/**
+ * BL-034: Lấy thông tin chi tiết một tài khoản người dùng theo ID.
+ * Endpoint: GET /api/users/{userId}
+ * Yêu cầu quyền: ADMIN
+ *
+ * @param {number|string} userId Mã định danh người dùng
+ * @returns {Promise<Object>} Thông tin chi tiết tài khoản
+ */
 export async function getCustomerById(userId) {
     const response = await fetch(`${API_URL}/${userId}`, {
         headers: authHeaders(),
@@ -42,6 +63,15 @@ export async function getCustomerById(userId) {
     return response.json();
 }
 
+/**
+ * BL-034: Cập nhật thông tin tài khoản người dùng (Admin).
+ * Endpoint: PUT /api/users/{userId}
+ * Yêu cầu quyền: ADMIN
+ *
+ * @param {number|string} userId Mã định danh người dùng cần cập nhật
+ * @param {Object} payload Dữ liệu cập nhật { fullName, email, phone, status, role }
+ * @returns {Promise<Object>} Thông tin tài khoản sau khi lưu
+ */
 export async function updateCustomer(userId, payload) {
     const response = await fetch(`${API_URL}/${userId}`, {
         method: "PUT",
@@ -59,6 +89,14 @@ export async function updateCustomer(userId, payload) {
     return response.json();
 }
 
+/**
+ * BL-032: Khóa tài khoản khách hàng (chuyển status thành BANNED).
+ * Endpoint: PATCH /api/users/{userId}/lock
+ * Yêu cầu quyền: ADMIN
+ *
+ * @param {number|string} userId Mã định danh khách hàng cần khóa
+ * @returns {Promise<Object>} Thông tin khách hàng với status mới
+ */
 export async function lockCustomer(userId) {
     const response = await fetch(`${API_URL}/${userId}/lock`, {
         method: "PATCH",
@@ -72,6 +110,13 @@ export async function lockCustomer(userId) {
     return response.json();
 }
 
+/**
+ * BL-033: Xóa vĩnh viễn tài khoản khách hàng.
+ * Endpoint: DELETE /api/users/{userId}
+ * Yêu cầu quyền: ADMIN
+ *
+ * @param {number|string} userId Mã định danh khách hàng cần xóa
+ */
 export async function deleteCustomer(userId) {
     const response = await fetch(`${API_URL}/${userId}`, {
         method: "DELETE",
@@ -83,7 +128,12 @@ export async function deleteCustomer(userId) {
     }
 }
 
-/** Lấy thông tin tài khoản đang đăng nhập. */
+/**
+ * Lấy thông tin tài khoản của người dùng đang đăng nhập hiện tại từ JWT token.
+ * Endpoint: GET /api/users/me
+ *
+ * @returns {Promise<Object>} Hồ sơ người dùng
+ */
 export async function getCurrentUser() {
     const token = getAccessToken();
 

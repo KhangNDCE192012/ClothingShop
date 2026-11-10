@@ -2,6 +2,9 @@ import {useEffect, useMemo, useState} from "react";
 import {deleteCustomer, getCustomers, lockCustomer, updateCustomer} from "../services/UserService";
 import "../css/AdminUsers.css";
 
+/**
+ * Định dạng ngày giờ hiển thị theo chuẩn tiếng Việt (dd/MM/yyyy HH:mm).
+ */
 const formatDate = (value) => {
     if (!value) return "—";
 
@@ -14,22 +17,37 @@ const formatDate = (value) => {
     }).format(new Date(value));
 };
 
+/**
+ * Chuẩn hóa chuỗi văn bản phục vụ tìm kiếm không phân biệt chữ hoa/thường.
+ */
 const normalize = (value) => String(value ?? "").toLocaleLowerCase("vi");
 
-/*
- * Nguyen Duy Khang
- * Hiển thị và quản lý tài khoản khách hàng trong trang ADMIN (BL-034).
+/**
+ * Nguyen Duy Khang / Khoi Nguyen
+ * Trang quản lý tài khoản khách hàng dành cho ADMIN.
+ * Bao gồm các chức năng:
+ * - BL-031: Xem danh sách khách hàng (Customer), tìm kiếm và lọc trạng thái.
+ * - BL-032: Khóa tài khoản khách hàng (status: BANNED).
+ * - BL-033: Xóa tài khoản khách hàng.
+ * - BL-034: Cập nhật thông tin tài khoản (Họ tên, email, phone, status, role).
  */
 export default function AdminUsers() {
+    // BL-031: Danh sách khách hàng tải từ backend
     const [customers, setCustomers] = useState([]);
+    // BL-031: Từ khóa tìm kiếm theo tên, username, email, số điện thoại
     const [search, setSearch] = useState("");
+    // BL-031: Bộ lọc trạng thái (ALL, ACTIVE, INACTIVE, BANNED)
     const [status, setStatus] = useState("ALL");
+    // Trạng thái đang tải dữ liệu danh sách
     const [loading, setLoading] = useState(true);
+    // Lỗi khi tải dữ liệu từ backend
     const [error, setError] = useState("");
+    // Lỗi khi thực hiện thao tác (khóa, xóa, cập nhật)
     const [actionError, setActionError] = useState("");
+    // Thao tác đang thực thi trên 1 dòng để tránh bấm lặp lại
     const [pendingAction, setPendingAction] = useState(null);
 
-    // Trạng thái modal chỉnh sửa thông tin tài khoản (BL-034)
+    // BL-034: Trạng thái modal chỉnh sửa thông tin tài khoản
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [editForm, setEditForm] = useState({
         fullName: "",
@@ -41,6 +59,9 @@ export default function AdminUsers() {
     const [editError, setEditError] = useState("");
     const [editSaving, setEditSaving] = useState(false);
 
+    /**
+     * BL-031: Hàm tải danh sách khách hàng từ backend thông qua getCustomers().
+     */
     async function loadCustomers() {
         setLoading(true);
         setError("");
@@ -55,6 +76,9 @@ export default function AdminUsers() {
         }
     }
 
+    /**
+     * BL-031: Hook chạy 1 lần khi trang được nạp để lấy dữ liệu ban đầu.
+     */
     useEffect(() => {
         let active = true;
 
@@ -74,11 +98,17 @@ export default function AdminUsers() {
         };
     }, []);
 
+    /**
+     * BL-031: Trích xuất danh sách các trạng thái duy nhất có trong dữ liệu khách hàng.
+     */
     const statuses = useMemo(
         () => [...new Set(customers.map((customer) => customer.status).filter(Boolean))],
         [customers]
     );
 
+    /**
+     * BL-031: Lọc danh sách khách hàng dựa trên từ khóa tìm kiếm và trạng thái đang chọn.
+     */
     const filteredCustomers = useMemo(() => {
         const keyword = normalize(search.trim());
 
@@ -95,6 +125,9 @@ export default function AdminUsers() {
         });
     }, [customers, search, status]);
 
+    /**
+     * BL-034: Mở modal chỉnh sửa và nạp thông tin của khách hàng vào form.
+     */
     function handleOpenEdit(customer) {
         setEditingCustomer(customer);
         setEditForm({
@@ -107,17 +140,26 @@ export default function AdminUsers() {
         setEditError("");
     }
 
+    /**
+     * BL-034: Đóng modal chỉnh sửa (chặn đóng khi đang lưu).
+     */
     function handleCloseEdit() {
         if (editSaving) return;
         setEditingCustomer(null);
         setEditError("");
     }
 
+    /**
+     * BL-034: Cập nhật giá trị các trường trong form chỉnh sửa.
+     */
     function handleEditChange(e) {
         const {name, value} = e.target;
         setEditForm((prev) => ({...prev, [name]: value}));
     }
 
+    /**
+     * BL-034: Validate dữ liệu form phía client và gửi request cập nhật lên server.
+     */
     async function handleSaveEdit(e) {
         e.preventDefault();
         setEditError("");
@@ -126,22 +168,26 @@ export default function AdminUsers() {
         const trimmedEmail = editForm.email.trim();
         const trimmedPhone = editForm.phone.trim();
 
+        // Kiểm tra bắt buộc email
         if (!trimmedEmail) {
             setEditError("Email không được để trống.");
             return;
         }
 
+        // Kiểm tra định dạng email và độ dài tối đa
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
         if (!emailRegex.test(trimmedEmail) || trimmedEmail.length > 100) {
             setEditError("Email không đúng định dạng hoặc vượt quá 100 ký tự.");
             return;
         }
 
+        // Kiểm tra độ dài họ và tên
         if (trimmedFullName.length > 100) {
             setEditError("Họ và tên không được vượt quá 100 ký tự.");
             return;
         }
 
+        // Kiểm tra định dạng số điện thoại (nếu có nhập)
         if (trimmedPhone) {
             const phoneRegex = /^\+?[0-9]{9,15}$/;
             if (!phoneRegex.test(trimmedPhone)) {
@@ -160,6 +206,7 @@ export default function AdminUsers() {
                 role: editForm.role,
             };
             const updated = await updateCustomer(editingCustomer.id, payload);
+            // Cập nhật lại đối tượng trong state customers mà không cần tải lại toàn bộ trang
             setCustomers((current) =>
                 current.map((item) => (item.id === updated.id ? updated : item))
             );
@@ -171,6 +218,9 @@ export default function AdminUsers() {
         }
     }
 
+    /**
+     * BL-032: Khóa tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
+     */
     async function handleLock(customer) {
         const confirmed = window.confirm(
             `Khóa tài khoản “${customer.username}”? Tài khoản này sẽ bị hạn chế sử dụng hệ thống.`
@@ -193,6 +243,9 @@ export default function AdminUsers() {
         }
     }
 
+    /**
+     * BL-033: Xóa vĩnh viễn tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
+     */
     async function handleDelete(customer) {
         const confirmed = window.confirm(
             `Xóa vĩnh viễn tài khoản “${customer.username}”? Thao tác này không thể hoàn tác.`
@@ -205,6 +258,7 @@ export default function AdminUsers() {
 
         try {
             await deleteCustomer(customer.id);
+            // Xóa khách hàng khỏi mảng state hiện tại
             setCustomers((current) => current.filter((item) => item.id !== customer.id));
         } catch (err) {
             setActionError(err.message || "Không thể xóa tài khoản.");
@@ -216,6 +270,7 @@ export default function AdminUsers() {
     return (
         <main className="admin-users-page">
             <div className="admin-content">
+                {/* Phần tiêu đề trang */}
                 <section className="admin-page-heading">
                     <div>
                         <p className="admin-eyebrow">USER MANAGEMENT</p>
@@ -228,6 +283,7 @@ export default function AdminUsers() {
                     </button>
                 </section>
 
+                {/* Thẻ thống kê tổng quan (BL-031) */}
                 <section className="admin-summary" aria-label="Thống kê khách hàng">
                     <article>
                         <span>Tổng khách hàng</span>
@@ -246,6 +302,7 @@ export default function AdminUsers() {
                     </article>
                 </section>
 
+                {/* Bảng dữ liệu và thanh tìm kiếm, lọc (BL-031) */}
                 <section className="admin-users-card">
                     <div className="admin-toolbar">
                         <label className="admin-search">

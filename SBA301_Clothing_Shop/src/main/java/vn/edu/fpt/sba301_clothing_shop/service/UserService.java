@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+/**
+ * Service xử lý các nghiệp vụ Quản lý người dùng (User Management).
+ * Bao gồm các chức năng: xem danh sách, khóa, xóa và cập nhật thông tin tài khoản.
+ */
 @Service
 public class UserService {
 
@@ -34,6 +38,12 @@ public class UserService {
         this.roleRepository = roleRepository;
     }
 
+    /**
+     * BL-031: Lấy danh sách toàn bộ khách hàng có vai trò CUSTOMER, sắp xếp giảm dần theo ngày tạo.
+     * Chuyển đổi Entity sang UserResponse để ẩn hoàn toàn trường mật khẩu.
+     *
+     * @return Danh sách UserResponse của tất cả khách hàng
+     */
     @Transactional(readOnly = true)
     public List<UserResponse> getCustomers() {
         return userRepository
@@ -43,6 +53,12 @@ public class UserService {
                 .toList();
     }
 
+    /**
+     * BL-032: Khóa một tài khoản khách hàng bằng cách chuyển status thành BANNED.
+     *
+     * @param id Mã định danh của khách hàng cần khóa
+     * @return UserResponse chứa trạng thái mới đã khóa
+     */
     @Transactional
     public UserResponse lockCustomer(Integer id) {
         User customer = findCustomer(id);
@@ -50,6 +66,13 @@ public class UserService {
         return UserResponse.from(userRepository.save(customer));
     }
 
+    /**
+     * BL-033: Xóa vĩnh viễn tài khoản khách hàng.
+     * Ràng buộc: Không được xóa khách hàng nếu đã phát sinh đơn hàng (Orders).
+     * Tự động dọn dẹp các giỏ hàng (Carts) liên quan trước khi xóa tài khoản.
+     *
+     * @param id Mã định danh của khách hàng cần xóa
+     */
     @Transactional
     public void deleteCustomer(Integer id) {
         User customer = findCustomer(id);
@@ -65,6 +88,12 @@ public class UserService {
         userRepository.delete(customer);
     }
 
+    /**
+     * Hàm helper tìm tài khoản theo ID và xác nhận tài khoản đó có role là CUSTOMER.
+     *
+     * @param id Mã định danh tài khoản
+     * @return Entity User của khách hàng nếu tìm thấy
+     */
     private User findCustomer(Integer id) {
         if (id == null || id <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID phải lớn hơn 0");
@@ -77,6 +106,12 @@ public class UserService {
                 ));
     }
 
+    /**
+     * Lấy thông tin entity User theo username phục vụ endpoint /api/users/me.
+     *
+     * @param username Tên đăng nhập của người dùng
+     * @return Entity User
+     */
     public User getInforUser(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy người dùng")
@@ -87,6 +122,12 @@ public class UserService {
         return userRepository.findById(userId).orElse(null);
     }
 
+    /**
+     * BL-034: Lấy thông tin chi tiết một tài khoản người dùng theo ID.
+     *
+     * @param id Mã định danh của người dùng
+     * @return UserResponse chứa thông tin người dùng
+     */
     @Transactional(readOnly = true)
     public UserResponse getUserById(Integer id) {
         if (id == null || id <= 0) {
@@ -100,6 +141,14 @@ public class UserService {
         return UserResponse.from(user);
     }
 
+    /**
+     * BL-034: Cập nhật thông tin tài khoản người dùng (Admin).
+     * Kiểm tra validation các trường: họ tên, email (định dạng, trùng lặp), số điện thoại, trạng thái và vai trò.
+     *
+     * @param id Mã định danh của người dùng cần cập nhật
+     * @param request DTO chứa các thông tin chỉnh sửa
+     * @return UserResponse chứa thông tin sau khi lưu
+     */
     @Transactional
     public UserResponse updateUser(Integer id, UserUpdateRequest request) {
         if (id == null || id <= 0) {
@@ -115,7 +164,7 @@ public class UserService {
                         "Không tìm thấy người dùng với ID: " + id
                 ));
 
-        // Cập nhật họ và tên
+        // Cập nhật họ và tên (tối đa 100 ký tự)
         if (request.fullName() != null) {
             String fullName = request.fullName().trim();
             if (fullName.length() > 100) {
@@ -124,7 +173,7 @@ public class UserService {
             user.setFullName(fullName.isEmpty() ? null : fullName);
         }
 
-        // Cập nhật email
+        // Cập nhật email (bắt buộc định dạng hợp lệ, không vượt quá 100 ký tự, không trùng với user khác)
         if (request.email() != null) {
             String email = request.email().trim().toLowerCase(Locale.ROOT);
             if (email.isEmpty()) {
@@ -142,7 +191,7 @@ public class UserService {
             user.setEmail(email);
         }
 
-        // Cập nhật số điện thoại
+        // Cập nhật số điện thoại (tùy chọn: 9-15 chữ số, có thể bắt đầu bằng dấu +)
         if (request.phone() != null) {
             String phone = request.phone().trim();
             if (!phone.isEmpty()) {
@@ -155,7 +204,7 @@ public class UserService {
             }
         }
 
-        // Cập nhật trạng thái
+        // Cập nhật trạng thái (chỉ nhận ACTIVE, INACTIVE hoặc BANNED)
         if (request.status() != null && !request.status().trim().isEmpty()) {
             String status = request.status().trim().toUpperCase(Locale.ROOT);
             if (!ALLOWED_STATUSES.contains(status)) {
@@ -164,7 +213,7 @@ public class UserService {
             user.setStatus(status);
         }
 
-        // Cập nhật vai trò
+        // Cập nhật vai trò (tìm theo tên Role trong bảng Roles: CUSTOMER, STAFF, ADMIN)
         if (request.role() != null && !request.role().trim().isEmpty()) {
             String roleName = request.role().trim();
             Role role = roleRepository.findByNameIgnoreCase(roleName)

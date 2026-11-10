@@ -28,6 +28,10 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+/**
+ * Service xử lý xác thực (Authentication), bao gồm đăng nhập (login) và đăng ký tài khoản (register).
+ * Tích hợp mã hóa BCrypt và cấp phát JWT token.
+ */
 @Service
 public class AuthenticationService {
 
@@ -61,6 +65,13 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * BL-024 & BL-025: Xác thực thông tin đăng nhập và tạo JWT token.
+     * Tự động nâng cấp mật khẩu cũ (plain text) sang BCrypt nếu phát hiện.
+     *
+     * @param request DTO chứa username và password
+     * @return AuthResponse chứa JWT access token, thời hạn và thông tin người dùng
+     */
     @Transactional
     public AuthResponse login(LoginRequest request) {
         String username = request.username().trim();
@@ -107,6 +118,15 @@ public class AuthenticationService {
         );
     }
 
+    /**
+     * BL-023: Đăng ký tài khoản khách hàng mới.
+     * Validate dữ liệu đầu vào (username 3-50 ký tự, email hợp lệ, password 6-72 byte).
+     * Mật khẩu được mã hóa an toàn bằng BCryptPasswordEncoder.
+     * Vai trò mặc định luôn là CUSTOMER, trạng thái ACTIVE.
+     *
+     * @param request DTO chứa thông tin đăng ký
+     * @return UserResponse chứa thông tin tài khoản vừa tạo (không bao gồm password)
+     */
     @Transactional
     public UserResponse register(RegisterRequest request) {
         if (request == null) {
