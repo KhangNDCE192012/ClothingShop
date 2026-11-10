@@ -16,6 +16,10 @@ const formatDate = (value) => {
 
 const normalize = (value) => String(value ?? "").toLocaleLowerCase("vi");
 
+/*
+ * Nguyen Duy Khang
+ * Hiển thị và quản lý tài khoản khách hàng trong trang ADMIN.
+ */
 export default function AdminUsers() {
     const [customers, setCustomers] = useState([]);
     const [search, setSearch] = useState("");
@@ -123,24 +127,10 @@ export default function AdminUsers() {
 
     return (
         <main className="admin-users-page">
-            <header className="admin-topbar">
-                <div className="admin-brand">
-                    <span className="admin-brand-mark">CS</span>
-                    <div>
-                        <strong>Clothing Shop</strong>
-                        <small>Admin workspace</small>
-                    </div>
-                </div>
-                <div className="admin-profile">
-                    <span>Quản trị viên</span>
-                    <div className="admin-avatar">A</div>
-                </div>
-            </header>
-
             <div className="admin-content">
                 <section className="admin-page-heading">
                     <div>
-                        <p className="admin-eyebrow">BL-031 · USER MANAGEMENT</p>
+                        <p className="admin-eyebrow">USER MANAGEMENT</p>
                         <h1>Danh sách khách hàng</h1>
                         <p>Quản lý và tra cứu những tài khoản có vai trò Customer.</p>
                     </div>

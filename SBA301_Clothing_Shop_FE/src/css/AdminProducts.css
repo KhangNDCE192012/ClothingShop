@@ -1,0 +1,496 @@
+/*
+ * Nguyen Duy Khang
+ * Giao diện quản lý sản phẩm BL-006 đến BL-010 và danh mục BL-012.
+ */
+.admin-products-page {
+    min-height: calc(100vh - 72px);
+    padding: 42px 24px;
+    background: #f4f6f8;
+    color: #17212b;
+}
+
+.admin-products-container {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+}
+
+.admin-products-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.admin-products-heading p {
+    margin: 0 0 8px;
+    color: #b45309;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.admin-products-heading h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.admin-products-heading span {
+    color: #64748b;
+}
+
+.admin-products-heading button,
+.admin-products-message button {
+    border: 0;
+    border-radius: 10px;
+    padding: 11px 18px;
+    background: #17212b;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-products-heading-actions { display: flex; align-items: center; gap: 10px; }
+.admin-products-heading-actions a { border-radius: 10px; padding: 11px 18px; background: #b45309; color: #fff; font-weight: 700; text-decoration: none; }
+
+.admin-products-heading button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.admin-category-card {
+    margin-bottom: 20px;
+    padding: 22px;
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    background: #f8fbff;
+}
+
+.admin-category-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.admin-category-heading p {
+    margin: 0 0 6px;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.admin-category-heading h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.admin-category-heading form {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-category-heading input,
+.admin-category-list input {
+    min-height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 11px;
+}
+
+.admin-category-heading button,
+.admin-category-list button {
+    min-height: 40px;
+    border: 0;
+    border-radius: 8px;
+    padding: 0 12px;
+    background: #1e3a5f;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-category-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 17px;
+}
+
+.admin-category-list article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.admin-category-list article > div {
+    display: flex;
+    gap: 6px;
+}
+
+.admin-category-list button:last-child {
+    background: #b91c1c;
+}
+
+.admin-category-list button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.category-action-success,
+.category-action-error {
+    margin: 13px 0 0;
+    font-weight: 700;
+}
+
+.category-action-success { color: #166534; }
+.category-action-error { color: #b91c1c; }
+
+.admin-product-create-card {
+    margin-bottom: 20px;
+    padding: 22px;
+    border: 1px solid #fed7aa;
+    border-radius: 14px;
+    background: #fffaf5;
+}
+
+.admin-product-create-card > div > p {
+    margin: 0 0 6px;
+    color: #b45309;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.admin-product-create-card h2 {
+    margin: 0 0 5px;
+    font-size: 1.35rem;
+}
+
+.admin-product-create-card > div > span {
+    color: #64748b;
+}
+
+.admin-product-create-form {
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) minmax(180px, 1fr) minmax(150px, 0.8fr) auto;
+    align-items: end;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.admin-product-create-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.admin-product-create-form input,
+.admin-product-create-form select {
+    min-height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    padding: 0 12px;
+    background: #fff;
+}
+
+.admin-product-create-form button {
+    min-height: 44px;
+    border: 0;
+    border-radius: 9px;
+    padding: 0 18px;
+    background: #b45309;
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.admin-product-create-form button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.admin-product-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-product-form-actions button:last-child {
+    background: #64748b;
+}
+
+.product-create-success,
+.product-create-error {
+    margin: 14px 0 0;
+    font-weight: 700;
+}
+
+.product-create-success {
+    color: #166534;
+}
+
+.product-create-error {
+    color: #b91c1c;
+}
+
+.admin-products-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.admin-products-summary article,
+.admin-products-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.admin-products-summary article {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 20px;
+}
+
+.admin-products-summary span {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.admin-products-summary strong {
+    font-size: 1.8rem;
+}
+
+.admin-products-card {
+    overflow: hidden;
+}
+
+.admin-products-toolbar {
+    display: flex;
+    gap: 12px;
+    padding: 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-products-toolbar input,
+.admin-products-toolbar select {
+    min-height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    padding: 0 13px;
+    background: #fff;
+    color: #17212b;
+}
+
+.admin-products-toolbar input {
+    flex: 1;
+}
+
+.admin-products-toolbar input:focus,
+.admin-products-toolbar select:focus {
+    border-color: #b45309;
+    outline: 3px solid rgba(180, 83, 9, 0.12);
+}
+
+.admin-products-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-products-table th,
+.admin-products-table td {
+    padding: 15px 18px;
+    border-bottom: 1px solid #eef2f6;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-products-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.admin-products-table tbody tr:hover {
+    background: #fffaf5;
+}
+
+.product-code {
+    color: #b45309;
+    font-weight: 800;
+}
+
+.product-status {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.product-status.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.product-status.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.product-edit-button {
+    display: inline-block;
+    text-decoration: none;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #1d4ed8;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.product-delete-button {
+    margin-left: 8px;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #b91c1c;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.product-delete-button:disabled { opacity: .6; cursor: wait; }
+.product-action-success, .product-action-error { margin: 14px 18px; font-weight: 700; }
+.product-action-success { color: #166534; }
+.product-action-error { color: #b91c1c; }
+
+/* Hộp xác nhận xóa nằm giữa màn hình và nổi trên trang quản trị. */
+.product-delete-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, .62);
+}
+
+.product-delete-dialog {
+    width: min(440px, 100%);
+    padding: 30px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .25);
+    text-align: center;
+}
+
+.product-delete-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.product-delete-dialog h2 { margin: 0 0 10px; font-size: 1.35rem; }
+.product-delete-dialog p { margin: 0; color: #475569; line-height: 1.6; }
+.product-delete-dialog strong { display: block; color: #17212b; overflow-wrap: anywhere; }
+.product-delete-actions { display: flex; gap: 10px; margin-top: 26px; }
+.product-delete-actions button {
+    flex: 1;
+    min-height: 44px;
+    border: 0;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.product-delete-actions button:first-child { background: #e2e8f0; color: #334155; }
+.product-delete-actions button:last-child { background: #b91c1c; color: #fff; }
+.product-delete-actions button:disabled { opacity: .6; cursor: wait; }
+
+.admin-products-message {
+    padding: 52px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+.admin-products-message.error {
+    color: #b91c1c;
+}
+
+.admin-products-card footer {
+    padding: 13px 18px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 700px) {
+    .admin-products-page {
+        padding: 26px 14px;
+    }
+
+    .admin-products-heading,
+    .admin-products-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .admin-products-heading-actions { flex-wrap: wrap; }
+
+    .admin-products-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-category-heading,
+    .admin-category-list article {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-category-heading form {
+        flex-direction: column;
+    }
+
+    .admin-category-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 980px) {
+    .admin-product-create-form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-product-create-form {
+        grid-template-columns: 1fr;
+    }
+}

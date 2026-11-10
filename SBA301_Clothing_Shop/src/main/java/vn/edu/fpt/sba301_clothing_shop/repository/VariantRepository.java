@@ -7,7 +7,13 @@ import vn.edu.fpt.sba301_clothing_shop.entity.Variant;
 
 import java.util.List;
 
+/**
+ * Nguyen Duy Khang
+ * Truy cập biến thể và tìm biến thể theo sản phẩm.
+ */
 @Repository
 public interface VariantRepository extends JpaRepository<Variant, Integer> {
+    /** Lấy biến thể để xóa trước sản phẩm. */
+    List<Variant> findAllByProduct_Id(Integer productId);
     List<VariantResponse> findVariantsByProductId(Integer id);
 }

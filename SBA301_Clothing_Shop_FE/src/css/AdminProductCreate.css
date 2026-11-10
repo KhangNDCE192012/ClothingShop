@@ -1,0 +1,24 @@
+/* Nguyen Duy Khang
+ * Giao diện riêng để tạo Product và Variant cho BL-007.
+ */
+.admin-create-page { min-height: 100vh; padding: 40px 20px; background: #f4f6f8; }
+.admin-create-container { max-width: 1050px; margin: auto; color: #17212b; }
+.admin-create-container > a { color: #1d4ed8; font-weight: 700; }
+.admin-create-container h1 { margin: 16px 0 6px; }
+.admin-create-container > p { color: #64748b; margin-bottom: 24px; }
+.admin-create-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.admin-create-section h2 { margin: 0 0 18px; font-size: 1.35rem; }
+.admin-create-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.admin-create-grid label { display: flex; flex-direction: column; gap: 7px; font-weight: 700; color: #475569; }
+.admin-create-grid input, .admin-create-grid select { min-height: 44px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; background: #fff; }
+.admin-create-image { grid-column: 1 / -1; }
+.admin-create-variant { padding: 18px; border: 1px solid #dbeafe; border-radius: 10px; margin-bottom: 14px; }
+.admin-create-variant h3 { margin: 0 0 14px; font-size: 1rem; }
+.admin-create-add, .admin-create-remove, .admin-create-submit { border: 0; border-radius: 9px; padding: 11px 17px; font-weight: 700; cursor: pointer; }
+.admin-create-add { background: #dbeafe; color: #1e40af; }
+.admin-create-remove { margin-top: 14px; background: #fee2e2; color: #991b1b; }
+.admin-create-submit { background: #b45309; color: #fff; }
+.admin-create-submit:disabled { opacity: .6; cursor: wait; }
+.admin-create-error { color: #b91c1c; font-weight: 700; }
+.admin-create-success { color: #166534; font-weight: 700; }
+@media (max-width: 650px) { .admin-create-grid { grid-template-columns: 1fr; } }

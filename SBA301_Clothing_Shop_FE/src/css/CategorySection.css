@@ -1,3 +1,6 @@
+/* Nguyen Duy Khang
+ * Giao diện danh mục trên Home và liên kết đến sản phẩm trong danh mục.
+ */
 .category-section {
     width: 100%;
     padding: 90px 24px;
@@ -100,6 +103,9 @@
     box-shadow:
             0 15px 35px rgba(0, 0, 0, 0.10);
 }
+
+.category-card-link { display: block; height: 100%; color: inherit; text-decoration: none; }
+.category-card-link:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
 
 
 /* IMAGE */

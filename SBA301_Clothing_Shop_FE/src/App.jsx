@@ -10,7 +10,15 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import AdminOrders from "./pages/AdminOrders";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
+import AdminProducts from "./pages/AdminProducts";
+import AdminProductCreate from "./pages/AdminProductCreate";
+import CategoryProducts from "./pages/CategoryProducts";
+import "./css/AdminTheme.css";
 
+/*
+ * Nguyen Duy Khang
+ * Khai báo các trang công khai và trang quản trị của ứng dụng.
+ */
 function App() {
   return (
     <>
@@ -21,6 +29,31 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/categories/:id" element={<CategoryProducts />} />
+          <Route
+              path="/admin/products/:id/edit"
+              element={(
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminProductCreate />
+                  </ProtectedRoute>
+              )}
+          />
+          <Route
+              path="/admin/products/new"
+              element={(
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminProductCreate />
+                  </ProtectedRoute>
+              )}
+          />
+          <Route
+              path="/admin/products"
+              element={(
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminProducts />
+                  </ProtectedRoute>
+              )}
+          />
           <Route
               path="/admin/users"
               element={(

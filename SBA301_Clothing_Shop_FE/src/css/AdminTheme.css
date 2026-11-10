@@ -1,0 +1,212 @@
+/* Nguyen Duy Khang
+ * Hệ màu, chữ và hiệu ứng chung cho Home và các trang quản trị.
+ */
+:root {
+    --shop-ink: #203027;
+    --shop-green: #173f2c;
+    --shop-green-hover: #24563d;
+    --shop-muted: #65756b;
+    --shop-line: #e1e7df;
+    --shop-ground: #f6f8f4;
+    --shop-warm: #f7f3eb;
+}
+
+/* Chỉ một thanh điều hướng dùng chung trên tất cả các trang. */
+.auth-header { box-shadow: none; border-bottom-color: var(--shop-line); }
+.auth-header-actions > a:not(.auth-header-login) { position: relative; min-height: 44px; }
+.auth-header-actions > a:not(.auth-header-login)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 5px;
+    height: 1px;
+    background: var(--shop-green);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .22s ease;
+}
+.auth-header-actions > a:not(.auth-header-login):hover::after,
+.auth-header-actions > a:not(.auth-header-login):focus-visible::after { transform: scaleX(1); }
+.auth-header button:active, .auth-header-login:active { transform: translateY(0); }
+
+.admin-users-page, .admin-products-page, .admin-orders-page {
+    min-height: calc(100svh - 72px);
+    background: var(--shop-ground);
+    color: var(--shop-ink);
+    font-family: inherit;
+}
+.admin-users-page { --admin-ink: var(--shop-ink); --admin-muted: var(--shop-muted); --admin-line: var(--shop-line); --admin-primary: var(--shop-green); }
+.admin-content, .admin-products-container, .admin-orders-container { width: min(1180px, calc(100% - 48px)); max-width: 1180px; margin-inline: auto; }
+.admin-content { padding-top: 48px; }
+.admin-products-page, .admin-orders-page { padding: 48px 0 72px; }
+.admin-products-heading, .admin-page-heading, .admin-orders-heading { align-items: flex-end; margin-bottom: 30px; gap: 24px; }
+.admin-page-heading h1, .admin-products-heading h1, .admin-orders-heading h1 {
+    margin: 8px 0 10px;
+    color: var(--shop-ink);
+    font-size: clamp(2.1rem, 3.8vw, 3rem);
+    line-height: 1.12;
+    letter-spacing: -.04em;
+}
+.admin-eyebrow, .admin-products-heading p, .admin-orders-eyebrow {
+    color: #52745c !important;
+    font-size: .76rem !important;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+.admin-page-heading > div > p:last-child, .admin-products-heading span, .admin-orders-heading p { color: var(--shop-muted); font-size: .95rem; }
+.admin-orders-breadcrumb { margin-bottom: 24px; }
+
+/* Số liệu và vùng dữ liệu dùng cùng viền, nền và độ sâu. */
+.admin-summary, .admin-products-summary, .admin-orders-stats { gap: 16px; margin-bottom: 20px; }
+.admin-summary article, .admin-products-summary article, .admin-orders-stat,
+.admin-users-card, .admin-products-card, .admin-orders-panel, .admin-category-card {
+    border: 1px solid var(--shop-line);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(24, 54, 36, .035);
+}
+.admin-category-card { background: #fff; }
+.admin-summary strong, .admin-products-summary strong, .admin-orders-stat strong { color: var(--shop-green); font-size: 1.8rem; }
+.admin-summary span, .admin-products-summary span, .admin-orders-stat span { color: var(--shop-muted); }
+.admin-category-heading p { color: #52745c; }
+.admin-category-list article { border-color: var(--shop-line); }
+
+/* Trường nhập và nút có cùng chiều cao, trạng thái focus rõ ràng. */
+.admin-search, .admin-filter select, .admin-products-toolbar input, .admin-products-toolbar select,
+.admin-orders-toolbar input, .admin-orders-toolbar select, .admin-category-heading input,
+.admin-category-list input { min-height: 44px; border-color: #d2ddd2; border-radius: 8px; }
+.admin-search:focus-within, .admin-filter select:focus-visible,
+.admin-products-toolbar input:focus-visible, .admin-products-toolbar select:focus-visible,
+.admin-orders-toolbar input:focus-visible, .admin-orders-toolbar select:focus-visible,
+.admin-category-heading input:focus-visible, .admin-category-list input:focus-visible {
+    outline: 2px solid #8db49a;
+    outline-offset: 2px;
+    box-shadow: none;
+}
+.admin-refresh, .admin-orders-refresh, .admin-products-heading button,
+.admin-products-heading-actions a, .admin-category-heading button,
+.admin-category-list button:not(:last-child), .admin-state button, .admin-orders-message button {
+    min-height: 44px;
+    border-radius: 8px;
+    background: var(--shop-green);
+    border-color: var(--shop-green);
+    color: #fff;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.admin-refresh:hover:not(:disabled), .admin-orders-refresh:hover:not(:disabled),
+.admin-products-heading button:hover:not(:disabled), .admin-products-heading-actions a:hover,
+.admin-category-heading button:hover:not(:disabled), .admin-category-list button:not(:last-child):hover:not(:disabled) {
+    background: var(--shop-green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 7px 15px rgba(23, 63, 44, .12);
+}
+.admin-refresh:active, .admin-orders-refresh:active, .admin-products-heading button:active,
+.admin-products-heading-actions a:active { transform: translateY(0); }
+.product-edit-button { background: var(--shop-green); }
+.product-edit-button:hover { background: var(--shop-green-hover); color: #fff; }
+
+.admin-users-table th, .admin-products-table th, .admin-orders-table th { background: #f7faf6; color: #617468; }
+.admin-users-table td, .admin-products-table td, .admin-orders-table td { border-color: #ebf0ea; }
+.admin-users-table tbody tr:hover, .admin-products-table tbody tr:hover,
+.admin-orders-table tbody tr:hover { background: #f8fbf7; }
+.product-code, .admin-orders-table .order-code, .admin-orders-table .order-price { color: var(--shop-green); }
+.admin-customer-avatar { background: #e7f1e9; color: var(--shop-green); }
+.admin-actions button, .product-delete-button, .product-edit-button { min-height: 36px; }
+
+/* Nút pastel đủ đậm để dễ đọc và phân biệt từng thao tác. */
+.admin-category-heading button {
+    background: #d8e2b8;
+    border-color: #d8e2b8;
+    color: #344b26;
+}
+.admin-category-heading button:hover:not(:disabled) {
+    background: #c6d49c;
+    border-color: #c6d49c;
+    color: #293d1e;
+}
+.admin-refresh, .admin-orders-refresh, .admin-products-heading button {
+    background: #d4dfea;
+    border-color: #d4dfea;
+    color: #29445b;
+}
+.admin-refresh:hover:not(:disabled), .admin-orders-refresh:hover:not(:disabled),
+.admin-products-heading button:hover:not(:disabled) {
+    background: #bed0df;
+    border-color: #bed0df;
+    color: #20384d;
+}
+.admin-products-heading-actions a {
+    background: #e8cc9f;
+    border-color: #e8cc9f;
+    color: #4b341b;
+}
+.admin-products-heading-actions a:hover {
+    background: #dbb97f;
+    border-color: #dbb97f;
+    color: #3a291a;
+}
+.admin-category-list button.category-rename-button {
+    background: #c9dce8;
+    border-color: #c9dce8;
+    color: #23465a;
+}
+.admin-category-list button.category-rename-button:hover:not(:disabled) {
+    background: #b4cede;
+    border-color: #b4cede;
+    color: #183b4d;
+}
+.admin-products-table .product-edit-button {
+    background: #c9dfcf;
+    color: #1c4932;
+}
+.admin-products-table .product-edit-button:hover {
+    background: #b2d2bb;
+    color: #143b29;
+}
+.admin-products-page .product-delete-button,
+.product-delete-actions button:last-child,
+.admin-category-list button:last-child,
+.admin-users-page .admin-action-delete {
+    background: #f2cfca;
+    border-color: #e5b8b2;
+    color: #783a35;
+}
+.admin-products-page .product-delete-button:hover:not(:disabled),
+.product-delete-actions button:last-child:hover:not(:disabled),
+.admin-category-list button:last-child:hover:not(:disabled),
+.admin-users-page .admin-action-delete:hover:not(:disabled) {
+    background: #e9bdb7;
+    border-color: #dda9a3;
+    color: #612b27;
+}
+.admin-products-table td > a:not(.product-edit-button) {
+    color: #183f2d;
+    text-decoration: none;
+}
+.admin-products-table td > a:not(.product-edit-button):hover strong {
+    color: #0f3021;
+}
+.admin-products-table td > a:not(.product-edit-button):focus-visible {
+    outline: 2px solid #8db49a;
+    outline-offset: 3px;
+}
+
+/* Chuyển động một lần khi mở trang, dừng khi hệ điều hành yêu cầu. */
+.admin-page-heading, .admin-products-heading, .admin-orders-heading { animation: shop-heading-enter .5s ease-out both; }
+@keyframes shop-heading-enter {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 720px) {
+    .admin-content, .admin-products-container, .admin-orders-container { width: calc(100% - 32px); }
+    .admin-products-page, .admin-orders-page { padding: 30px 0 58px; }
+    .admin-content { padding-top: 30px; }
+    .admin-page-heading, .admin-products-heading, .admin-orders-heading { align-items: stretch; flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .admin-page-heading, .admin-products-heading, .admin-orders-heading { animation: none; }
+    .auth-header-actions > a:not(.auth-header-login)::after,
+    .admin-refresh, .admin-orders-refresh, .admin-products-heading button,
+    .admin-products-heading-actions a, .admin-category-heading button { transition: none; }
+}

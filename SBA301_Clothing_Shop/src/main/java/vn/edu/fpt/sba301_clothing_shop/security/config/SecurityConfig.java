@@ -19,6 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import vn.edu.fpt.sba301_clothing_shop.security.JwtAuthenticationFilter;
 import vn.edu.fpt.sba301_clothing_shop.security.LegacyCompatiblePasswordEncoder;
 
+/**
+ * Nguyen Duy Khang
+ * Cấu hình quyền truy cập API và xác thực JWT.
+ */
 @Configuration
 public class SecurityConfig {
 
@@ -60,12 +64,20 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        // BL-003: Danh sách và chi tiết sản phẩm / danh mục công khai
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**", "/api/categories", "/api/categories/**").permitAll()
+                        // BL-007, BL-008, BL-009, BL-029: Thao tác ghi Product chỉ dành cho ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/products", "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products", "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products", "/api/products/**").hasRole("ADMIN")
+                        // BL-012: Thao tác ghi Category chỉ dành cho ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/categories", "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                        // BL-028, BL-030: Đơn hàng & Giỏ hàng
                         .requestMatchers(HttpMethod.POST, "/api/orders/checkout").authenticated()
                         .requestMatchers("/api/carts", "/api/carts/**").authenticated()
+                        // BL-030: User me cho người dùng đăng nhập; Quản lý user chỉ dành cho ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
                         .requestMatchers("/api/users", "/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/orders/manage/**", "/api/orders", "/api/orders/**").hasRole("ADMIN")

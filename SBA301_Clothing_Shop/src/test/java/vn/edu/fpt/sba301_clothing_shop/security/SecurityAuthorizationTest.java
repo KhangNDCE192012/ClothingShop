@@ -301,5 +301,33 @@ class SecurityAuthorizationTest {
             mockMvc.perform(delete("/api/products/1").with(user("admin").roles("ADMIN")))
                     .andExpect(isNot401Or403());
         }
+
+        @Test
+        @DisplayName("POST/PUT/DELETE /api/categories - 401 unauthenticated, 403 CUSTOMER, non-401/403 ADMIN (BL-012)")
+        void testCategoryWriteApisAuthorization() throws Exception {
+            // POST /api/categories
+            mockMvc.perform(post("/api/categories").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\"}"))
+                    .andExpect(status().isUnauthorized());
+            mockMvc.perform(post("/api/categories").with(user("customer").roles("CUSTOMER")).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\"}"))
+                    .andExpect(status().isForbidden());
+            mockMvc.perform(post("/api/categories").with(user("admin").roles("ADMIN")).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\"}"))
+                    .andExpect(isNot401Or403());
+
+            // PUT /api/categories/1
+            mockMvc.perform(put("/api/categories/1").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\"}"))
+                    .andExpect(status().isUnauthorized());
+            mockMvc.perform(put("/api/categories/1").with(user("customer").roles("CUSTOMER")).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\"}"))
+                    .andExpect(status().isForbidden());
+            mockMvc.perform(put("/api/categories/1").with(user("admin").roles("ADMIN")).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\"}"))
+                    .andExpect(isNot401Or403());
+
+            // DELETE /api/categories/1
+            mockMvc.perform(delete("/api/categories/1"))
+                    .andExpect(status().isUnauthorized());
+            mockMvc.perform(delete("/api/categories/1").with(user("customer").roles("CUSTOMER")))
+                    .andExpect(status().isForbidden());
+            mockMvc.perform(delete("/api/categories/1").with(user("admin").roles("ADMIN")))
+                    .andExpect(isNot401Or403());
+        }
     }
 }
