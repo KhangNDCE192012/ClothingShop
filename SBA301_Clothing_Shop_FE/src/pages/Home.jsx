@@ -4,6 +4,7 @@ import CategorySection from "../components/CategorySection";
 import FeaturedProducts from "../components/FeaturedProducts";
 
 /*
+ * Nguyen Duy Khang
  * Trang Home ghép banner, giới thiệu, sản phẩm nổi bật và danh mục sản phẩm.
  */
 function Home() {

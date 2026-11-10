@@ -4,7 +4,7 @@ import {getProducts} from "../services/ProductService";
 import "../css/FeaturedProducts.css";
 
 /*
- * Nguyen Duy Khang - CE192012
+ * Nguyen Duy Khang
  * Hiển thị tối đa 8 sản phẩm ACTIVE mới nhất và điều hướng đến trang sản phẩm.
  */
 export default function FeaturedProducts() {

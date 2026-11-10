@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getCategories } from "../services/CategoryService";
 import "../css/CategorySection.css";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
+/*
+ * Nguyen Duy Khang
+ * Hiển thị danh mục trên Home và dẫn đến danh sách sản phẩm theo danh mục.
+ */
 function CategorySection() {
-
-    const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -51,7 +53,7 @@ function CategorySection() {
     };
 
     return (
-        <section className="category-section">
+        <section className="category-section" id="categories">
 
             <div className="category-wrapper">
 
@@ -92,11 +94,9 @@ function CategorySection() {
 
                         {categories.map((category, index) => (
 
-                            <article
-                                className="category-card"
-                                key={category.id}
-                                onClick={() => navigate(`/products/${category.id}`)}
-                            >
+                            <article className="category-card" key={category.id}>
+                                <Link className="category-card-link" to={`/categories/${category.id}`}
+                                    aria-label={`Xem sản phẩm thuộc danh mục ${category.name}`}>
 
                                 <div className="category-card-image">
 
@@ -105,7 +105,6 @@ function CategorySection() {
                                         <img
                                             src={category.image}
                                             alt={category.name}
-                                            onClick={() => navigate(`/products/${category.id}`)}
                                         />
 
                                     ) : (
@@ -159,6 +158,7 @@ function CategorySection() {
 
                                 </div>
 
+                                </Link>
                             </article>
 
                         ))}
