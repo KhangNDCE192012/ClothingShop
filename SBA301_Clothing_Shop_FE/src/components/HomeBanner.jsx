@@ -1,7 +1,6 @@
 import { Container } from "react-bootstrap";
 import Banner from "../assets/Banner.png";
 import "../css/Home.css";
-import {Link} from "react-router-dom";
 
 /*
  * Nguyen Duy Khang
@@ -25,7 +24,7 @@ function HomeBanner() {
                 <p className="home-banner-description">
                     Chọn danh mục, xem các mẫu đang bán và tìm món đồ phù hợp với bạn.
                 </p>
-                <Link className="home-banner-action" to="/#categories">Xem danh mục <span aria-hidden="true">↗</span></Link>
+            
             </Container>
         </section>
     );
