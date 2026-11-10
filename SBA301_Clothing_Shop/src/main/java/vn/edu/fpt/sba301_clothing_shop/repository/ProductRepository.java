@@ -39,4 +39,7 @@ public interface ProductRepository
      */
     @EntityGraph(attributePaths = "category")
     Optional<Product> findProductById(Integer id);
+
+    /** Đếm Product đang dùng Category để tránh xóa gây mất liên kết dữ liệu. */
+    long countByCategoryId(Integer categoryId);
 }

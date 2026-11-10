@@ -1,6 +1,10 @@
 package vn.edu.fpt.sba301_clothing_shop.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.CategoryRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.CategoryResponse;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.VariantResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.Category;
@@ -13,6 +17,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Xử lý đọc, tạo, đổi tên và xóa Category trong module Product BL-012.
+ */
 @Service
 public class CategoryService {
 
@@ -41,6 +48,72 @@ public class CategoryService {
                         buildCategoryResponse(category, products)
                 )
                 .toList();
+    }
+
+    /** Tạo Category mới sau khi chuẩn hóa và kiểm tra trùng tên. */
+    @Transactional
+    public CategoryResponse createCategory(CategoryRequest request) {
+        String name = normalizeName(request.name());
+        if (categoryRepository.existsByNameIgnoreCase(name)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Tên danh mục đã tồn tại"
+            );
+        }
+
+        Category category = new Category();
+        category.setName(name);
+        Category savedCategory = categoryRepository.save(category);
+        return CategoryResponse.fromBasic(savedCategory.getId(), savedCategory.getName());
+    }
+
+    /** Đổi tên Category nhưng không cho phép trùng tên với Category khác. */
+    @Transactional
+    public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
+        Category category = findCategory(id);
+        String name = normalizeName(request.name());
+
+        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Tên danh mục đã tồn tại"
+            );
+        }
+
+        category.setName(name);
+        Category savedCategory = categoryRepository.save(category);
+        return CategoryResponse.fromBasic(savedCategory.getId(), savedCategory.getName());
+    }
+
+    /** Chỉ xóa Category chưa được Product nào sử dụng. */
+    @Transactional
+    public void deleteCategory(Integer id) {
+        Category category = findCategory(id);
+
+        if (productRepository.countByCategoryId(id) > 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Không thể xóa danh mục đang có sản phẩm"
+            );
+        }
+
+        categoryRepository.delete(category);
+    }
+
+    private Category findCategory(Integer id) {
+        if (id == null || id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category ID phải lớn hơn 0");
+        }
+
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Không tìm thấy danh mục có ID: " + id
+                ));
+    }
+
+    private String normalizeName(String name) {
+        return name.trim();
     }
 
     private CategoryResponse buildCategoryResponse(

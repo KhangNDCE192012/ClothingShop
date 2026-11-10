@@ -2,6 +2,9 @@ package vn.edu.fpt.sba301_clothing_shop.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * Entity ánh xạ bảng Categories để quản lý danh mục và gán cho Product.
+ */
 @Entity
 @Table(name = "Categories")
 public class Category {

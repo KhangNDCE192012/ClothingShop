@@ -64,6 +64,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**", "/api/categories", "/api/categories/**").permitAll()
                         // BL-007: chỉ ADMIN được phép tạo sản phẩm mới.
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        // BL-012: các thao tác thay đổi Category chỉ dành cho ADMIN.
+                        .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/orders/manage/**").hasRole("ADMIN")
