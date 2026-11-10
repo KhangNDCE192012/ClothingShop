@@ -4,10 +4,21 @@ import useAuth from "../auth/useAuth";
 import {register} from "../services/AuthService";
 import "../css/Register.css";
 
+// Regex kiểm tra định dạng tên đăng nhập (chữ cái, số, dấu chấm, gạch dưới, gạch ngang)
 const USERNAME_REGEX = /^[a-zA-Z0-9._-]+$/;
+// Regex kiểm tra định dạng email chuẩn
 const EMAIL_REGEX = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+// Regex kiểm tra định dạng số điện thoại (9-15 số, tùy chọn bắt đầu bằng +)
 const PHONE_REGEX = /^\+?[0-9]{9,15}$/;
 
+/**
+ * Nguyen Duy Khang / Khoi Nguyen
+ * Trang Đăng ký tài khoản khách hàng mới (BL-023).
+ * - Thu thập thông tin: username, email, họ tên, số điện thoại, mật khẩu.
+ * - Kiểm tra hợp lệ dữ liệu chặt chẽ ở phía Client trước khi gửi.
+ * - Gửi request POST /api/auth/register lên backend, mật khẩu được mã hóa BCrypt.
+ * - Đăng ký thành công sẽ tự động điều hướng sang màn hình /login.
+ */
 export default function Register() {
     const {user} = useAuth();
     const navigate = useNavigate();

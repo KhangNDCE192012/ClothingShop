@@ -65,7 +65,7 @@ export default function AuthHeader() {
         };
     }, [user, loadCart]);
 
-    // Đăng xuất
+    // BL-026: Đăng xuất tài khoản - Xóa session JWT phía client và điều hướng về trang chủ
     function handleLogout() {
         logout();
         setCartCount(0);

@@ -126,6 +126,56 @@ export default function AdminUsers() {
     }, [customers, search, status]);
 
     /**
+     * BL-032: Khóa tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
+     */
+    async function handleLock(customer) {
+        const confirmed = window.confirm(
+            `Khóa tài khoản “${customer.username}”? Tài khoản này sẽ bị hạn chế sử dụng hệ thống.`
+        );
+
+        if (!confirmed) return;
+
+        setPendingAction({id: customer.id, type: "lock"});
+        setActionError("");
+
+        try {
+            const updatedCustomer = await lockCustomer(customer.id);
+            setCustomers((current) => current.map((item) =>
+                item.id === updatedCustomer.id ? updatedCustomer : item
+            ));
+        } catch (err) {
+            setActionError(err.message || "Không thể khóa tài khoản.");
+        } finally {
+            setPendingAction(null);
+        }
+    }
+
+    /**
+     * BL-033: Xóa vĩnh viễn tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
+     */
+    async function handleDelete(customer) {
+        const confirmed = window.confirm(
+            `Xóa vĩnh viễn tài khoản “${customer.username}”? Thao tác này không thể hoàn tác.`
+        );
+
+        if (!confirmed) return;
+
+        setPendingAction({id: customer.id, type: "delete"});
+        setActionError("");
+
+        try {
+            await deleteCustomer(customer.id);
+            // Xóa khách hàng khỏi mảng state hiện tại
+            setCustomers((current) => current.filter((item) => item.id !== customer.id));
+        } catch (err) {
+            setActionError(err.message || "Không thể xóa tài khoản.");
+        } finally {
+            setPendingAction(null);
+        }
+    }
+
+
+    /**
      * BL-034: Mở modal chỉnh sửa và nạp thông tin của khách hàng vào form.
      */
     function handleOpenEdit(customer) {
@@ -218,55 +268,7 @@ export default function AdminUsers() {
         }
     }
 
-    /**
-     * BL-032: Khóa tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
-     */
-    async function handleLock(customer) {
-        const confirmed = window.confirm(
-            `Khóa tài khoản “${customer.username}”? Tài khoản này sẽ bị hạn chế sử dụng hệ thống.`
-        );
-
-        if (!confirmed) return;
-
-        setPendingAction({id: customer.id, type: "lock"});
-        setActionError("");
-
-        try {
-            const updatedCustomer = await lockCustomer(customer.id);
-            setCustomers((current) => current.map((item) =>
-                item.id === updatedCustomer.id ? updatedCustomer : item
-            ));
-        } catch (err) {
-            setActionError(err.message || "Không thể khóa tài khoản.");
-        } finally {
-            setPendingAction(null);
-        }
-    }
-
-    /**
-     * BL-033: Xóa vĩnh viễn tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
-     */
-    async function handleDelete(customer) {
-        const confirmed = window.confirm(
-            `Xóa vĩnh viễn tài khoản “${customer.username}”? Thao tác này không thể hoàn tác.`
-        );
-
-        if (!confirmed) return;
-
-        setPendingAction({id: customer.id, type: "delete"});
-        setActionError("");
-
-        try {
-            await deleteCustomer(customer.id);
-            // Xóa khách hàng khỏi mảng state hiện tại
-            setCustomers((current) => current.filter((item) => item.id !== customer.id));
-        } catch (err) {
-            setActionError(err.message || "Không thể xóa tài khoản.");
-        } finally {
-            setPendingAction(null);
-        }
-    }
-
+    
     return (
         <main className="admin-users-page">
             <div className="admin-content">
