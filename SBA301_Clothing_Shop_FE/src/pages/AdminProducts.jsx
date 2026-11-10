@@ -1,10 +1,11 @@
 import {useEffect, useMemo, useState} from "react";
-import {getProducts} from "../services/ProductService";
+import {createProduct, getProducts} from "../services/ProductService";
+import {getCategories} from "../services/CategoryService";
 import "../css/AdminProducts.css";
 
 /*
- * Nguyen Duy Khang - CE192012
- * Trang BL-006 hiển thị và tra cứu danh sách sản phẩm dành riêng cho ADMIN.
+ * Nguyen Duy Khang
+ * Trang ADMIN hiển thị danh sách BL-006 và form tạo sản phẩm BL-007.
  */
 export default function AdminProducts() {
     // State lưu dữ liệu từ backend và trạng thái hiển thị của trang.
@@ -13,6 +14,11 @@ export default function AdminProducts() {
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [categories, setCategories] = useState([]);
+    const [form, setForm] = useState({name: "", categoryId: "", status: "ACTIVE"});
+    const [submitting, setSubmitting] = useState(false);
+    const [createError, setCreateError] = useState("");
+    const [createMessage, setCreateMessage] = useState("");
 
     /** Tải lại danh sách, đồng thời xử lý loading và lỗi tại một nơi. */
     async function loadProducts() {
@@ -33,9 +39,11 @@ export default function AdminProducts() {
     useEffect(() => {
         let active = true;
 
-        getProducts()
-            .then((data) => {
-                if (active) setProducts(Array.isArray(data) ? data : []);
+        Promise.all([getProducts(), getCategories()])
+            .then(([productData, categoryData]) => {
+                if (!active) return;
+                setProducts(Array.isArray(productData) ? productData : []);
+                setCategories(Array.isArray(categoryData) ? categoryData : []);
             })
             .catch((requestError) => {
                 if (active) {
@@ -50,6 +58,30 @@ export default function AdminProducts() {
             active = false;
         };
     }, []);
+
+    /** Gửi form, thêm product vừa tạo lên đầu bảng và xóa dữ liệu form. */
+    async function handleCreateProduct(event) {
+        event.preventDefault();
+        setSubmitting(true);
+        setCreateError("");
+        setCreateMessage("");
+
+        try {
+            const createdProduct = await createProduct({
+                name: form.name.trim(),
+                categoryId: Number(form.categoryId),
+                status: form.status,
+            });
+
+            setProducts((current) => [createdProduct, ...current]);
+            setForm({name: "", categoryId: "", status: "ACTIVE"});
+            setCreateMessage(`Đã tạo sản phẩm “${createdProduct.name}” thành công.`);
+        } catch (requestError) {
+            setCreateError(requestError.message || "Không thể tạo sản phẩm.");
+        } finally {
+            setSubmitting(false);
+        }
+    }
 
     // Tạo danh sách trạng thái động từ dữ liệu backend để tránh viết cứng.
     const statuses = useMemo(
@@ -102,6 +134,71 @@ export default function AdminProducts() {
                         ↻ {loading ? "Đang tải..." : "Làm mới"}
                     </button>
                 </header>
+
+                <section className="admin-product-create-card" aria-labelledby="create-product-title">
+                    <div>
+                        <p>BL-007 · ADD PRODUCT</p>
+                        <h2 id="create-product-title">Thêm sản phẩm mới</h2>
+                        <span>Nhập thông tin cơ bản; ảnh, giá và tồn kho sẽ thuộc phần Variant.</span>
+                    </div>
+
+                    <form className="admin-product-create-form" onSubmit={handleCreateProduct}>
+                        <label>
+                            Tên sản phẩm
+                            <input
+                                type="text"
+                                value={form.name}
+                                maxLength={150}
+                                required
+                                onChange={(event) => setForm((current) => ({
+                                    ...current,
+                                    name: event.target.value,
+                                }))}
+                                placeholder="Ví dụ: Áo thun Essential"
+                            />
+                        </label>
+
+                        <label>
+                            Danh mục
+                            <select
+                                value={form.categoryId}
+                                required
+                                onChange={(event) => setForm((current) => ({
+                                    ...current,
+                                    categoryId: event.target.value,
+                                }))}
+                            >
+                                <option value="">Chọn danh mục</option>
+                                {categories.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+
+                        <label>
+                            Trạng thái
+                            <select
+                                value={form.status}
+                                onChange={(event) => setForm((current) => ({
+                                    ...current,
+                                    status: event.target.value,
+                                }))}
+                            >
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="INACTIVE">INACTIVE</option>
+                            </select>
+                        </label>
+
+                        <button type="submit" disabled={submitting || categories.length === 0}>
+                            {submitting ? "Đang tạo..." : "+ Thêm sản phẩm"}
+                        </button>
+                    </form>
+
+                    {createMessage && <p className="product-create-success" role="status">{createMessage}</p>}
+                    {createError && <p className="product-create-error" role="alert">{createError}</p>}
+                </section>
 
                 <section className="admin-products-summary" aria-label="Thống kê sản phẩm">
                     <article>

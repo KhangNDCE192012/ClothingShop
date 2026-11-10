@@ -60,7 +60,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products","/api/users/**", "/api/products/**", "/api/categories", "/api/categories/**").permitAll()
+                        // Nguyen Duy Khang - CE192012: BL-003 cần danh sách và chi tiết sản phẩm công khai.
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**", "/api/categories", "/api/categories/**").permitAll()
+                        // BL-007: chỉ ADMIN được phép tạo sản phẩm mới.
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/orders/manage/**").hasRole("ADMIN")
                         .requestMatchers("/api/carts", "/api/carts/**").authenticated()

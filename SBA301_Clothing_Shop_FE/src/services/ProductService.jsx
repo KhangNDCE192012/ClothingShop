@@ -1,8 +1,8 @@
 import {getAccessToken} from "./AuthService";
 
 /*
- * Nguyen Duy Khang - CE192012
- * Gọi API sản phẩm cho BL-003, BL-005, BL-006 và chi tiết BL-011.
+ * Nguyen Duy Khang
+ * Gọi API sản phẩm cho các chức năng đọc và tạo sản phẩm.
  */
 const API_URL = "http://localhost:8080/api/products";
 
@@ -24,6 +24,39 @@ export async function getProducts() {
             message = body.message || body.detail || message;
         } catch {
             // Giữ thông báo mặc định nếu response không phải JSON.
+        }
+
+        throw new Error(`${message} (HTTP ${response.status})`);
+    }
+
+    return response.json();
+}
+
+/** BL-007: gửi Product mới kèm JWT của ADMIN. */
+export async function createProduct(payload) {
+    const token = getAccessToken();
+
+    if (!token) {
+        throw new Error("Bạn chưa đăng nhập. Vui lòng đăng nhập lại.");
+    }
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        let message = "Không thể tạo sản phẩm";
+
+        try {
+            const body = await response.json();
+            message = body.message || body.detail || message;
+        } catch {
+            // Giữ thông báo mặc định nếu backend không trả JSON.
         }
 
         throw new Error(`${message} (HTTP ${response.status})`);
