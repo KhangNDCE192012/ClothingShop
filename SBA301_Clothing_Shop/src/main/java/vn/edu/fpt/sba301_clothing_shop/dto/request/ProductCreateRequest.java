@@ -5,9 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
+import java.util.List;
 
 /**
- * DTO nhận và kiểm tra dữ liệu ADMIN gửi lên khi tạo sản phẩm BL-007.
+ * Nguyen Duy Khang
+ * DTO kiểm tra dữ liệu ADMIN gửi lên khi tạo BL-007 hoặc sửa Product BL-008.
  */
 public record ProductCreateRequest(
         @NotBlank(message = "Tên sản phẩm không được để trống")
@@ -23,6 +26,9 @@ public record ProductCreateRequest(
                 flags = Pattern.Flag.CASE_INSENSITIVE,
                 message = "Trạng thái sản phẩm phải là ACTIVE hoặc INACTIVE"
         )
-        String status
+        String status,
+
+        // BL-007 cần ít nhất một biến thể để trang chi tiết có giá, ảnh và tồn kho.
+        List<@NotNull @Valid VariantCreateRequest> variants
 ) {
 }

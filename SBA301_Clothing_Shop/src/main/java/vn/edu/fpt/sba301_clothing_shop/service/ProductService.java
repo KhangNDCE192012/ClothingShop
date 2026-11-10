@@ -2,11 +2,13 @@ package vn.edu.fpt.sba301_clothing_shop.service;
 
 
 import vn.edu.fpt.sba301_clothing_shop.dto.request.ProductCreateRequest;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.VariantCreateRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.ProductDetailResponse;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.ProductListResponse;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.VariantResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.Category;
 import vn.edu.fpt.sba301_clothing_shop.entity.Product;
+import vn.edu.fpt.sba301_clothing_shop.entity.Variant;
 import vn.edu.fpt.sba301_clothing_shop.repository.CategoryRepository;
 import vn.edu.fpt.sba301_clothing_shop.repository.ProductRepository;
 import vn.edu.fpt.sba301_clothing_shop.repository.VariantRepository;
@@ -18,9 +20,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
- * Xử lý nghiệp vụ đọc và tạo sản phẩm cho các chức năng Product/Home.
+ * Nguyen Duy Khang
+ * Xử lý nghiệp vụ đọc, tạo và chỉnh sửa Product trong Product Management/Home.
  */
 @Service
 public class ProductService {
@@ -52,11 +56,10 @@ public class ProductService {
      */
     @Transactional
     public ProductListResponse createProduct(ProductCreateRequest request) {
-        Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Không tìm thấy danh mục có ID: " + request.categoryId()
-                ));
+        if (request.variants() == null || request.variants().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cần ít nhất một biến thể sản phẩm");
+        }
+        Category category = findCategory(request.categoryId());
 
         Product product = new Product();
         product.setName(request.name().trim());
@@ -66,6 +69,47 @@ public class ProductService {
 
         Product savedProduct = productRepository.save(product);
 
+        // Cùng transaction: nếu một Variant lưu lỗi, Product cũng được rollback.
+        List<Variant> variants = request.variants().stream().map(item -> {
+            Variant variant = new Variant();
+            variant.setProduct(savedProduct);
+            variant.setSize(item.size().trim());
+            variant.setColor(item.color().trim());
+            variant.setImage(item.image().trim());
+            variant.setQuantity(item.quantity());
+            variant.setPrice(item.price());
+            return variant;
+        }).toList();
+        variantRepository.saveAll(variants);
+        BigDecimal minPrice = variants.stream().map(Variant::getPrice)
+                .min(BigDecimal::compareTo).orElseThrow();
+
+        return new ProductListResponse(
+                savedProduct.getId(),
+                savedProduct.getName(),
+                category.getId(),
+                category.getName(),
+                savedProduct.getStatus(),
+                savedProduct.getCreatedAt(),
+                variants.get(0).getImage(),
+                minPrice
+        );
+    }
+
+    /**
+     * BL-008: kiểm tra Product và Category rồi cập nhật các trường được phép sửa.
+     * ID, ngày tạo và Variant không bị thay đổi.
+     */
+    @Transactional
+    public ProductListResponse updateProduct(Integer id, ProductCreateRequest request) {
+        Product product = findProduct(id);
+        Category category = findCategory(request.categoryId());
+
+        product.setName(request.name().trim());
+        product.setCategory(category);
+        product.setStatus(normalizeStatus(request.status()));
+
+        Product savedProduct = productRepository.save(product);
         return new ProductListResponse(
                 savedProduct.getId(),
                 savedProduct.getName(),
@@ -90,6 +134,14 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(Integer id) {
+        Product product = findProduct(id);
+        List<VariantResponse> variants = variantRepository.findVariantsByProductId(id);
+
+        return ProductDetailResponse.from(product, variants);
+    }
+
+    /** Kiểm tra ID và trả Product kèm Category để dùng chung cho BL-008/BL-011. */
+    private Product findProduct(Integer id) {
         if (id == null || id <= 0) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -97,14 +149,19 @@ public class ProductService {
             );
         }
 
-        Product product = productRepository.findProductById(id)
+        return productRepository.findProductById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Không tìm thấy sản phẩm có ID: " + id
                 ));
+    }
 
-        List<VariantResponse> variants = variantRepository.findVariantsByProductId(id);
-
-        return ProductDetailResponse.from(product, variants);
+    /** Kiểm tra Category được chọn có tồn tại trước khi lưu Product. */
+    private Category findCategory(Integer categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Không tìm thấy danh mục có ID: " + categoryId
+                ));
     }
 }

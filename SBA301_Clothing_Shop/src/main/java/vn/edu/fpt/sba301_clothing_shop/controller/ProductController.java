@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Cung cấp API danh sách và chi tiết sản phẩm cho các chức năng Product/Home.
+ * Nguyen Duy Khang
+ * Cung cấp API đọc, tạo và chỉnh sửa Product cho Product Management/Home.
  */
 @RestController
 @RequestMapping("/api/products")
@@ -53,5 +54,14 @@ public class ProductController {
             @PathVariable Integer id
     ) {
         return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+    /** BL-008: nhận dữ liệu hợp lệ và trả Product sau khi ADMIN cập nhật. */
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductListResponse> updateProduct(
+            @PathVariable Integer id,
+            @Valid @RequestBody ProductCreateRequest request
+    ) {
+        return ResponseEntity.ok(productService.updateProduct(id, request));
     }
 }

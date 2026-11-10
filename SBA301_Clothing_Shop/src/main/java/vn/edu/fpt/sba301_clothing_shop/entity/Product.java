@@ -1,9 +1,12 @@
 package vn.edu.fpt.sba301_clothing_shop.entity;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Nguyen Duy Khang
+ * Entity ánh xạ bảng Products và liên kết mỗi Product với một Category.
+ */
 @Entity
 @Table(name = "Products")
 public class Product {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Nguyen Duy Khang
  * Truy cập dữ liệu sản phẩm cho danh sách quản lý và khu vực nổi bật trên Home.
  */
 @Repository
