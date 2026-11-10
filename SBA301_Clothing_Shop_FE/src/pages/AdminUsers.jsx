@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {deleteCustomer, getCustomers, lockCustomer} from "../services/UserService";
+import {deleteCustomer, getCustomers, lockCustomer, updateCustomer} from "../services/UserService";
 import "../css/AdminUsers.css";
 
 const formatDate = (value) => {
@@ -18,7 +18,7 @@ const normalize = (value) => String(value ?? "").toLocaleLowerCase("vi");
 
 /*
  * Nguyen Duy Khang
- * Hiển thị và quản lý tài khoản khách hàng trong trang ADMIN.
+ * Hiển thị và quản lý tài khoản khách hàng trong trang ADMIN (BL-034).
  */
 export default function AdminUsers() {
     const [customers, setCustomers] = useState([]);
@@ -28,6 +28,18 @@ export default function AdminUsers() {
     const [error, setError] = useState("");
     const [actionError, setActionError] = useState("");
     const [pendingAction, setPendingAction] = useState(null);
+
+    // Trạng thái modal chỉnh sửa thông tin tài khoản (BL-034)
+    const [editingCustomer, setEditingCustomer] = useState(null);
+    const [editForm, setEditForm] = useState({
+        fullName: "",
+        email: "",
+        phone: "",
+        status: "ACTIVE",
+        role: "CUSTOMER",
+    });
+    const [editError, setEditError] = useState("");
+    const [editSaving, setEditSaving] = useState(false);
 
     async function loadCustomers() {
         setLoading(true);
@@ -82,6 +94,82 @@ export default function AdminUsers() {
             return matchesStatus && matchesSearch;
         });
     }, [customers, search, status]);
+
+    function handleOpenEdit(customer) {
+        setEditingCustomer(customer);
+        setEditForm({
+            fullName: customer.fullName || "",
+            email: customer.email || "",
+            phone: customer.phone || "",
+            status: customer.status || "ACTIVE",
+            role: customer.role || "CUSTOMER",
+        });
+        setEditError("");
+    }
+
+    function handleCloseEdit() {
+        if (editSaving) return;
+        setEditingCustomer(null);
+        setEditError("");
+    }
+
+    function handleEditChange(e) {
+        const {name, value} = e.target;
+        setEditForm((prev) => ({...prev, [name]: value}));
+    }
+
+    async function handleSaveEdit(e) {
+        e.preventDefault();
+        setEditError("");
+
+        const trimmedFullName = editForm.fullName.trim();
+        const trimmedEmail = editForm.email.trim();
+        const trimmedPhone = editForm.phone.trim();
+
+        if (!trimmedEmail) {
+            setEditError("Email không được để trống.");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        if (!emailRegex.test(trimmedEmail) || trimmedEmail.length > 100) {
+            setEditError("Email không đúng định dạng hoặc vượt quá 100 ký tự.");
+            return;
+        }
+
+        if (trimmedFullName.length > 100) {
+            setEditError("Họ và tên không được vượt quá 100 ký tự.");
+            return;
+        }
+
+        if (trimmedPhone) {
+            const phoneRegex = /^\+?[0-9]{9,15}$/;
+            if (!phoneRegex.test(trimmedPhone)) {
+                setEditError("Số điện thoại không hợp lệ (phải từ 9-15 chữ số, có thể bắt đầu bằng +).");
+                return;
+            }
+        }
+
+        setEditSaving(true);
+        try {
+            const payload = {
+                fullName: trimmedFullName,
+                email: trimmedEmail,
+                phone: trimmedPhone,
+                status: editForm.status,
+                role: editForm.role,
+            };
+            const updated = await updateCustomer(editingCustomer.id, payload);
+            setCustomers((current) =>
+                current.map((item) => (item.id === updated.id ? updated : item))
+            );
+            setEditingCustomer(null);
+        } catch (err) {
+            setEditError(err.message || "Không thể cập nhật thông tin tài khoản.");
+        } finally {
+            setEditSaving(false);
+        }
+    }
 
     async function handleLock(customer) {
         const confirmed = window.confirm(
@@ -248,6 +336,14 @@ export default function AdminUsers() {
                                             <div className="admin-actions">
                                                 <button
                                                     type="button"
+                                                    className="admin-action-edit"
+                                                    disabled={pendingAction?.id === customer.id}
+                                                    onClick={() => handleOpenEdit(customer)}
+                                                >
+                                                    Sửa
+                                                </button>
+                                                <button
+                                                    type="button"
                                                     className="admin-action-lock"
                                                     disabled={customer.status === "BANNED" || pendingAction?.id === customer.id}
                                                     onClick={() => handleLock(customer)}
@@ -276,6 +372,139 @@ export default function AdminUsers() {
                     )}
                 </section>
             </div>
+
+            {/* Modal cập nhật thông tin tài khoản (BL-034) */}
+            {editingCustomer && (
+                <div className="admin-modal-backdrop" onClick={handleCloseEdit}>
+                    <div
+                        className="admin-modal"
+                        role="dialog"
+                        aria-labelledby="edit-user-title"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="admin-modal-header">
+                            <h2 id="edit-user-title">Cập nhật thông tin tài khoản</h2>
+                            <button
+                                type="button"
+                                className="admin-modal-close"
+                                onClick={handleCloseEdit}
+                                aria-label="Đóng"
+                                disabled={editSaving}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <form className="admin-modal-form" onSubmit={handleSaveEdit}>
+                            {editError && (
+                                <div className="admin-modal-error" role="alert">
+                                    {editError}
+                                </div>
+                            )}
+
+                            <div className="admin-form-group">
+                                <label htmlFor="edit-username">Tên đăng nhập (Username)</label>
+                                <input
+                                    id="edit-username"
+                                    type="text"
+                                    value={editingCustomer.username}
+                                    disabled
+                                />
+                            </div>
+
+                            <div className="admin-form-group">
+                                <label htmlFor="edit-fullname">Họ và tên</label>
+                                <input
+                                    id="edit-fullname"
+                                    name="fullName"
+                                    type="text"
+                                    value={editForm.fullName}
+                                    onChange={handleEditChange}
+                                    placeholder="Nhập họ và tên"
+                                    maxLength={100}
+                                    disabled={editSaving}
+                                />
+                            </div>
+
+                            <div className="admin-form-group">
+                                <label htmlFor="edit-email">Email *</label>
+                                <input
+                                    id="edit-email"
+                                    name="email"
+                                    type="email"
+                                    value={editForm.email}
+                                    onChange={handleEditChange}
+                                    placeholder="example@domain.com"
+                                    maxLength={100}
+                                    required
+                                    disabled={editSaving}
+                                />
+                            </div>
+
+                            <div className="admin-form-group">
+                                <label htmlFor="edit-phone">Số điện thoại</label>
+                                <input
+                                    id="edit-phone"
+                                    name="phone"
+                                    type="text"
+                                    value={editForm.phone}
+                                    onChange={handleEditChange}
+                                    placeholder="0912345678"
+                                    disabled={editSaving}
+                                />
+                            </div>
+
+                            <div className="admin-form-group">
+                                <label htmlFor="edit-status">Trạng thái *</label>
+                                <select
+                                    id="edit-status"
+                                    name="status"
+                                    value={editForm.status}
+                                    onChange={handleEditChange}
+                                    disabled={editSaving}
+                                >
+                                    <option value="ACTIVE">ACTIVE (Đang hoạt động)</option>
+                                    <option value="INACTIVE">INACTIVE (Chưa kích hoạt)</option>
+                                    <option value="BANNED">BANNED (Đã khóa)</option>
+                                </select>
+                            </div>
+
+                            <div className="admin-form-group">
+                                <label htmlFor="edit-role">Vai trò *</label>
+                                <select
+                                    id="edit-role"
+                                    name="role"
+                                    value={editForm.role}
+                                    onChange={handleEditChange}
+                                    disabled={editSaving}
+                                >
+                                    <option value="CUSTOMER">CUSTOMER</option>
+                                    <option value="STAFF">STAFF</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                </select>
+                            </div>
+
+                            <div className="admin-modal-actions">
+                                <button
+                                    type="button"
+                                    className="admin-modal-btn-cancel"
+                                    onClick={handleCloseEdit}
+                                    disabled={editSaving}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="admin-modal-btn-submit"
+                                    disabled={editSaving}
+                                >
+                                    {editSaving ? "Đang lưu..." : "Lưu thay đổi"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

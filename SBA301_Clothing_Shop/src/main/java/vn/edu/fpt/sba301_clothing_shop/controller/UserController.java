@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import vn.edu.fpt.sba301_clothing_shop.dto.request.UserUpdateRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.response.UserResponse;
 import vn.edu.fpt.sba301_clothing_shop.entity.User;
 import vn.edu.fpt.sba301_clothing_shop.service.UserService;
@@ -29,6 +32,19 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponse>> getCustomers() {
         return ResponseEntity.ok(userService.getCustomers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable Integer id,
+            @RequestBody UserUpdateRequest request
+    ) {
+        return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
     @PatchMapping("/{id}/lock")

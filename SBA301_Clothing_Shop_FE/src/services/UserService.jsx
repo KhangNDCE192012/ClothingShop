@@ -30,6 +30,35 @@ export async function getCustomers() {
     return response.json();
 }
 
+export async function getCustomerById(userId) {
+    const response = await fetch(`${API_URL}/${userId}`, {
+        headers: authHeaders(),
+    });
+
+    if (!response.ok) {
+        await throwResponseError(response, "Không thể lấy thông tin tài khoản");
+    }
+
+    return response.json();
+}
+
+export async function updateCustomer(userId, payload) {
+    const response = await fetch(`${API_URL}/${userId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            ...authHeaders(),
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        await throwResponseError(response, "Không thể cập nhật thông tin tài khoản");
+    }
+
+    return response.json();
+}
+
 export async function lockCustomer(userId) {
     const response = await fetch(`${API_URL}/${userId}/lock`, {
         method: "PATCH",
@@ -53,7 +82,6 @@ export async function deleteCustomer(userId) {
         await throwResponseError(response, "Không thể xóa tài khoản");
     }
 }
-
 
 /** Lấy thông tin tài khoản đang đăng nhập. */
 export async function getCurrentUser() {
@@ -79,4 +107,3 @@ export async function getCurrentUser() {
 
     return response.json();
 }
-

@@ -91,6 +91,12 @@ class SecurityAuthorizationTest {
         when(userService.lockCustomer(anyInt())).thenReturn(
                 new UserResponse(1, "testuser", "test@example.com", "Test User", "0123456789", "CUSTOMER", "ACTIVE", LocalDateTime.now())
         );
+        when(userService.getUserById(anyInt())).thenReturn(
+                new UserResponse(1, "testuser", "test@example.com", "Test User", "0123456789", "CUSTOMER", "ACTIVE", LocalDateTime.now())
+        );
+        when(userService.updateUser(anyInt(), any())).thenReturn(
+                new UserResponse(1, "testuser", "test@example.com", "Test User", "0123456789", "CUSTOMER", "ACTIVE", LocalDateTime.now())
+        );
         when(orderService.getAllOrder()).thenReturn(Collections.emptyList());
         when(orderService.getOrderById(anyInt())).thenReturn(Collections.emptyList());
         when(orderService.checkout(anyString(), any(CheckoutRequest.class))).thenReturn(
@@ -177,6 +183,52 @@ class SecurityAuthorizationTest {
             mockMvc.perform(delete("/api/users/1").with(user("admin").roles("ADMIN")))
                     .andExpect(isNot401Or403())
                     .andExpect(status().isNoContent());
+        }
+
+        @Test
+        @DisplayName("PUT /api/users/{id} - 401 unauthenticated, 403 CUSTOMER, non-401/403 ADMIN (BL-034)")
+        void testPutUserAuthorization() throws Exception {
+            String updateJson = "{\"fullName\":\"Updated Name\",\"email\":\"updated@example.com\"}";
+
+            // Không token -> 401
+            mockMvc.perform(put("/api/users/1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(updateJson))
+                    .andExpect(status().isUnauthorized());
+
+            // CUSTOMER -> 403
+            mockMvc.perform(put("/api/users/1")
+                            .with(user("customer").roles("CUSTOMER"))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(updateJson))
+                    .andExpect(status().isForbidden());
+
+            // ADMIN -> 200 (không phải 401/403)
+            mockMvc.perform(put("/api/users/1")
+                            .with(user("admin").roles("ADMIN"))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(updateJson))
+                    .andExpect(isNot401Or403())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("GET /api/users/{id} - 401 unauthenticated, 403 CUSTOMER, non-401/403 ADMIN (BL-034)")
+        void testGetUserByIdAuthorization() throws Exception {
+            // Không token -> 401
+            mockMvc.perform(get("/api/users/1"))
+                    .andExpect(status().isUnauthorized());
+
+            // CUSTOMER -> 403
+            mockMvc.perform(get("/api/users/1")
+                            .with(user("customer").roles("CUSTOMER")))
+                    .andExpect(status().isForbidden());
+
+            // ADMIN -> 200
+            mockMvc.perform(get("/api/users/1")
+                            .with(user("admin").roles("ADMIN")))
+                    .andExpect(isNot401Or403())
+                    .andExpect(status().isOk());
         }
     }
 
