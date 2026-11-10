@@ -88,6 +88,11 @@ export default function AuthHeader() {
 
                         {user.role === "ADMIN" && (
                             <>
+                                {/* Nguyen Duy Khang - CE192012: lối vào trang BL-006. */}
+                                <Link to="/admin/products">
+                                    Quản lý sản phẩm
+                                </Link>
+
                                 <Link to="/admin/users">
                                     Quản lý người dùng
                                 </Link>

@@ -10,6 +10,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import AdminOrders from "./pages/AdminOrders";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
+import AdminProducts from "./pages/AdminProducts";
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/products/:id" element={<ProductDetail />} />
+          <Route
+              path="/admin/products"
+              element={(
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminProducts />
+                  </ProtectedRoute>
+              )}
+          />
           <Route
               path="/admin/users"
               element={(

@@ -1,0 +1,205 @@
+/*
+ * Nguyen Duy Khang - CE192012
+ * Giao diện responsive cho trang danh sách sản phẩm BL-006.
+ */
+.admin-products-page {
+    min-height: calc(100vh - 72px);
+    padding: 42px 24px;
+    background: #f4f6f8;
+    color: #17212b;
+}
+
+.admin-products-container {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+}
+
+.admin-products-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.admin-products-heading p {
+    margin: 0 0 8px;
+    color: #b45309;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.admin-products-heading h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.admin-products-heading span {
+    color: #64748b;
+}
+
+.admin-products-heading button,
+.admin-products-message button {
+    border: 0;
+    border-radius: 10px;
+    padding: 11px 18px;
+    background: #17212b;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-products-heading button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.admin-products-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.admin-products-summary article,
+.admin-products-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.admin-products-summary article {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 20px;
+}
+
+.admin-products-summary span {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.admin-products-summary strong {
+    font-size: 1.8rem;
+}
+
+.admin-products-card {
+    overflow: hidden;
+}
+
+.admin-products-toolbar {
+    display: flex;
+    gap: 12px;
+    padding: 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-products-toolbar input,
+.admin-products-toolbar select {
+    min-height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    padding: 0 13px;
+    background: #fff;
+    color: #17212b;
+}
+
+.admin-products-toolbar input {
+    flex: 1;
+}
+
+.admin-products-toolbar input:focus,
+.admin-products-toolbar select:focus {
+    border-color: #b45309;
+    outline: 3px solid rgba(180, 83, 9, 0.12);
+}
+
+.admin-products-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-products-table th,
+.admin-products-table td {
+    padding: 15px 18px;
+    border-bottom: 1px solid #eef2f6;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-products-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.admin-products-table tbody tr:hover {
+    background: #fffaf5;
+}
+
+.product-code {
+    color: #b45309;
+    font-weight: 800;
+}
+
+.product-status {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.product-status.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.product-status.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.admin-products-message {
+    padding: 52px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+.admin-products-message.error {
+    color: #b91c1c;
+}
+
+.admin-products-card footer {
+    padding: 13px 18px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 700px) {
+    .admin-products-page {
+        padding: 26px 14px;
+    }
+
+    .admin-products-heading,
+    .admin-products-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-products-summary {
+        grid-template-columns: 1fr;
+    }
+}
