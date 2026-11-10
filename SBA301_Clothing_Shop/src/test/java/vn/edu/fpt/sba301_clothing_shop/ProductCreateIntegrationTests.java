@@ -3,6 +3,7 @@ package vn.edu.fpt.sba301_clothing_shop;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.ProductCreateRequest;
 import vn.edu.fpt.sba301_clothing_shop.dto.request.VariantCreateRequest;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SpringBootTest
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ProductCreateIntegrationTests {
 
     @Autowired ProductService productService;
