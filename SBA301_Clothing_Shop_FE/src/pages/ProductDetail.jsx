@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from "react";
 import {Link, useParams} from "react-router-dom";
-import {getVariants} from "../services/ProductService";
+import {getProductById} from "../services/ProductService";
 import {addToCart} from "../services/CartService.jsx";
 import "../css/ProductDetail.css";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +14,14 @@ const formatPrice = (price) =>
         maximumFractionDigits: 0,
     }).format(price ?? 0);
 
+/*
+ * Trang chi tiết lấy tên Product và Variant thực tế từ GET /api/products/{id}.
+ */
 export default function ProductDetail() {
     const {id} = useParams();
     const navigate = useNavigate();
     const [variants, setVariants] = useState([]);
+    const [product, setProduct] = useState(null);
     const [selected, setSelected] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -52,11 +56,12 @@ export default function ProductDetail() {
             setError("");
 
             try {
-                const data = await getVariants(id);
+                const data = await getProductById(id);
 
                 if (!active) return;
 
-                const list = Array.isArray(data) ? data : [];
+                const list = Array.isArray(data?.variants) ? data.variants : [];
+                setProduct(data);
                 setVariants(list);
                 setSelected(list[0] ?? null);
                 setQuantity(1);
@@ -185,10 +190,8 @@ export default function ProductDetail() {
 
                     <div className="detail-info">
                         <span className="detail-eyebrow">THỜI TRANG HẰNG NGÀY</span>
-                        <h1>Basic T-Shirt</h1>
-                        <p className="detail-description">
-                            Thiết kế đơn giản, dễ phối đồ và phù hợp với nhiều phong cách.
-                        </p>
+                        <h1>{product?.name}</h1>
+                        <p className="detail-description">Danh mục: {product?.categoryName}</p>
 
                         <div className="detail-price-row">
                             <strong className="detail-price">
@@ -208,10 +211,6 @@ export default function ProductDetail() {
                             </div>
                             <div className="detail-colors">
                                 {colors.map((color) => {
-                                    // const variant = variants.find(
-                                    //     (v) => v.color === color
-                                    // );
-
                                     const unavailable = !variants.some(
                                         (v) => v.color === color && v.quantity > 0
                                     );
@@ -224,16 +223,10 @@ export default function ProductDetail() {
                                             className={`detail-color ${
                                                 selected.color === color ? "active" : ""
                                             }`}
+                                            aria-pressed={selected.color === color}
                                             onClick={() => chooseColor(color)}
                                         >
-
-                                                <span
-                                                    className="color-box"
-                                                    style={{backgroundColor: color}}
-                                                    title={color}
-                                                />
-
-
+                                            {color}
                                         </button>
                                     );
                                 })}

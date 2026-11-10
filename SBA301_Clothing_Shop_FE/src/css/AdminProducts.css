@@ -1,5 +1,6 @@
 /*
- * Giao diện responsive cho danh sách BL-006 và form tạo sản phẩm BL-007.
+ * Nguyen Duy Khang
+ * Giao diện Product BL-006/BL-007/BL-008 và Category Management BL-012.
  */
 .admin-products-page {
     min-height: calc(100vh - 72px);
@@ -49,10 +50,107 @@
     cursor: pointer;
 }
 
+.admin-products-heading-actions { display: flex; align-items: center; gap: 10px; }
+.admin-products-heading-actions a { border-radius: 10px; padding: 11px 18px; background: #b45309; color: #fff; font-weight: 700; text-decoration: none; }
+
 .admin-products-heading button:disabled {
     cursor: wait;
     opacity: 0.65;
 }
+
+.admin-category-card {
+    margin-bottom: 20px;
+    padding: 22px;
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    background: #f8fbff;
+}
+
+.admin-category-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.admin-category-heading p {
+    margin: 0 0 6px;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.admin-category-heading h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.admin-category-heading form {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-category-heading input,
+.admin-category-list input {
+    min-height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 11px;
+}
+
+.admin-category-heading button,
+.admin-category-list button {
+    min-height: 40px;
+    border: 0;
+    border-radius: 8px;
+    padding: 0 12px;
+    background: #1e3a5f;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-category-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 17px;
+}
+
+.admin-category-list article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.admin-category-list article > div {
+    display: flex;
+    gap: 6px;
+}
+
+.admin-category-list button:last-child {
+    background: #b91c1c;
+}
+
+.admin-category-list button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.category-action-success,
+.category-action-error {
+    margin: 13px 0 0;
+    font-weight: 700;
+}
+
+.category-action-success { color: #166534; }
+.category-action-error { color: #b91c1c; }
 
 .admin-product-create-card {
     margin-bottom: 20px;
@@ -119,6 +217,15 @@
 .admin-product-create-form button:disabled {
     cursor: wait;
     opacity: 0.6;
+}
+
+.admin-product-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-product-form-actions button:last-child {
+    background: #64748b;
 }
 
 .product-create-success,
@@ -251,6 +358,18 @@
     color: #991b1b;
 }
 
+.product-edit-button {
+    display: inline-block;
+    text-decoration: none;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #1d4ed8;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .admin-products-message {
     padding: 52px 20px;
     text-align: center;
@@ -278,8 +397,23 @@
         align-items: stretch;
         flex-direction: column;
     }
+    .admin-products-heading-actions { flex-wrap: wrap; }
 
     .admin-products-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-category-heading,
+    .admin-category-list article {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-category-heading form {
+        flex-direction: column;
+    }
+
+    .admin-category-list {
         grid-template-columns: 1fr;
     }
 }

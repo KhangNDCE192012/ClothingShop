@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Nguyen Duy Khang
@@ -60,6 +61,9 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cần ít nhất một biến thể sản phẩm");
         }
         Category category = findCategory(request.categoryId());
+        if (request.variants().stream().anyMatch(item -> item.id() != null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Biến thể mới không được có ID");
+        }
 
         Product product = new Product();
         product.setName(request.name().trim());
@@ -70,16 +74,8 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
 
         // Cùng transaction: nếu một Variant lưu lỗi, Product cũng được rollback.
-        List<Variant> variants = request.variants().stream().map(item -> {
-            Variant variant = new Variant();
-            variant.setProduct(savedProduct);
-            variant.setSize(item.size().trim());
-            variant.setColor(item.color().trim());
-            variant.setImage(item.image().trim());
-            variant.setQuantity(item.quantity());
-            variant.setPrice(item.price());
-            return variant;
-        }).toList();
+        List<Variant> variants = request.variants().stream()
+                .map(item -> fillVariant(new Variant(), savedProduct, item)).toList();
         variantRepository.saveAll(variants);
         BigDecimal minPrice = variants.stream().map(Variant::getPrice)
                 .min(BigDecimal::compareTo).orElseThrow();
@@ -97,19 +93,44 @@ public class ProductService {
     }
 
     /**
-     * BL-008: kiểm tra Product và Category rồi cập nhật các trường được phép sửa.
-     * ID, ngày tạo và Variant không bị thay đổi.
+     * BL-008/BL-010: sửa Product và tồn kho từng Variant trong cùng transaction, giữ ID và ngày tạo.
+     * Variant cũ không bị xóa vì Cart/OrderDetails có thể đang tham chiếu.
      */
     @Transactional
     public ProductListResponse updateProduct(Integer id, ProductCreateRequest request) {
         Product product = findProduct(id);
         Category category = findCategory(request.categoryId());
+        if (request.variants() != null) {
+            long idCount = request.variants().stream().map(VariantCreateRequest::id)
+                    .filter(Objects::nonNull).count();
+            long uniqueIdCount = request.variants().stream().map(VariantCreateRequest::id)
+                    .filter(Objects::nonNull).distinct().count();
+            if (idCount != uniqueIdCount) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Một biến thể không được gửi lặp lại nhiều lần");
+            }
+        }
+
+        // Kiểm tra quyền sở hữu toàn bộ ID trước khi thay đổi bất kỳ dữ liệu nào.
+        List<Variant> variants = request.variants() == null ? null : request.variants().stream()
+                .map(item -> {
+                    Variant variant = item.id() == null ? new Variant() : variantRepository.findById(item.id())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Không tìm thấy biến thể có ID: " + item.id()));
+                    if (item.id() != null && !variant.getProduct().getId().equals(id)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Biến thể không thuộc sản phẩm đang sửa");
+                    }
+                    return fillVariant(variant, product, item);
+                }).toList();
 
         product.setName(request.name().trim());
         product.setCategory(category);
         product.setStatus(normalizeStatus(request.status()));
 
         Product savedProduct = productRepository.save(product);
+        if (variants != null) variantRepository.saveAll(variants);
+        List<VariantResponse> currentVariants = variantRepository.findVariantsByProductId(id);
         return new ProductListResponse(
                 savedProduct.getId(),
                 savedProduct.getName(),
@@ -117,9 +138,22 @@ public class ProductService {
                 category.getName(),
                 savedProduct.getStatus(),
                 savedProduct.getCreatedAt(),
-                null,
-                null
+                currentVariants.stream().map(VariantResponse::image)
+                        .filter(image -> image != null && !image.isBlank()).findFirst().orElse(null),
+                currentVariants.stream().map(VariantResponse::price)
+                        .min(BigDecimal::compareTo).orElse(null)
         );
+    }
+
+    /** Chỉ các trường cho phép sửa được gán vào Variant. */
+    private Variant fillVariant(Variant variant, Product product, VariantCreateRequest item) {
+        variant.setProduct(product);
+        variant.setSize(item.size().trim());
+        variant.setColor(item.color().trim());
+        variant.setImage(item.image().trim());
+        variant.setQuantity(item.quantity());
+        variant.setPrice(item.price());
+        return variant;
     }
 
     /** Nếu frontend không gửi status thì sản phẩm mới mặc định ACTIVE. */

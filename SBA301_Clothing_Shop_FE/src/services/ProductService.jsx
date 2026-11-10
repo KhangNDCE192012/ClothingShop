@@ -2,7 +2,7 @@ import {getAccessToken} from "./AuthService";
 
 /*
  * Nguyen Duy Khang
- * Gọi API sản phẩm cho các chức năng đọc và tạo sản phẩm.
+ * Gọi API đọc, tạo và chỉnh sửa Product cho Product Management/Home.
  */
 const API_URL = "http://localhost:8080/api/products";
 
@@ -32,16 +32,16 @@ export async function getProducts() {
     return response.json();
 }
 
-/** BL-007: gửi Product mới kèm JWT của ADMIN. */
-export async function createProduct(payload) {
+/** Gửi dữ liệu Product kèm JWT và xử lý lỗi chung cho BL-007/BL-008. */
+async function saveProduct(method, url, payload, fallbackMessage) {
     const token = getAccessToken();
 
     if (!token) {
         throw new Error("Bạn chưa đăng nhập. Vui lòng đăng nhập lại.");
     }
 
-    const response = await fetch(API_URL, {
-        method: "POST",
+    const response = await fetch(url, {
+        method,
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ export async function createProduct(payload) {
     });
 
     if (!response.ok) {
-        let message = "Không thể tạo sản phẩm";
+        let message = fallbackMessage;
 
         try {
             const body = await response.json();
@@ -63,6 +63,21 @@ export async function createProduct(payload) {
     }
 
     return response.json();
+}
+
+/** BL-007: tạo Product mới. */
+export function createProduct(payload) {
+    return saveProduct("POST", API_URL, payload, "Không thể tạo sản phẩm");
+}
+
+/** BL-008: cập nhật Product đã tồn tại theo ID. */
+export function updateProduct(productId, payload) {
+    return saveProduct(
+        "PUT",
+        `${API_URL}/${productId}`,
+        payload,
+        "Không thể cập nhật sản phẩm"
+    );
 }
 
 /** Gọi BL-011 và trả về object Product đầy đủ theo ID. */
