@@ -53,7 +53,7 @@ export default function FeaturedProducts() {
     };
 
     return (
-        <section className="featured-products" aria-labelledby="featured-products-title">
+        <section className="featured-products" id="featured-products" aria-labelledby="featured-products-title">
             <div className="featured-products-container">
                 <header className="featured-products-heading">
                     <p>FEATURED PRODUCTS</p>

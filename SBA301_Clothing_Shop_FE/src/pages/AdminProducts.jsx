@@ -261,6 +261,7 @@ export default function AdminProducts() {
                                         <>
                                             <button
                                                 type="button"
+                                                className="category-rename-button"
                                                 onClick={() => {
                                                     setEditingCategoryId(category.id);
                                                     setEditingCategoryName(category.name);

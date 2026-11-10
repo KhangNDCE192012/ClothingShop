@@ -13,6 +13,7 @@ import AdminOrderDetail from "./pages/AdminOrderDetail";
 import AdminProducts from "./pages/AdminProducts";
 import AdminProductCreate from "./pages/AdminProductCreate";
 import CategoryProducts from "./pages/CategoryProducts";
+import "./css/AdminTheme.css";
 
 /*
  * Nguyen Duy Khang

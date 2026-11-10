@@ -1,218 +1,67 @@
+/* Nguyen Duy Khang
+ * Ảnh mở đầu Home và lối vào danh mục sản phẩm.
+ */
 .home-banner {
     position: relative;
-    width: 100%;
-    min-height: 520px;
-
     display: flex;
     align-items: center;
-
+    min-height: min(800px, calc(100svh - 72px));
+    background-position: center 42%;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    color: white;
+    color: #fff;
 }
-
+.home-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(20, 28, 24, .73) 0%, rgba(20, 28, 24, .34) 48%, transparent 77%);
+}
 .home-banner-content {
-    width: 100%;
-    padding: 80px 60px !important;
+    position: relative;
+    z-index: 1;
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 90px 24px !important;
+    animation: home-enter .7s ease-out both;
 }
-
-.home-banner-subtitle {
-    margin: 0 0 14px 0;
-    color: white;
-
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 3px;
-}
-
+.home-banner-subtitle { margin: 0 0 18px; font-size: .8rem; font-weight: 700; letter-spacing: .22em; }
 .home-banner h1 {
-    margin: 0 0 18px 0;
-
-    color: white;
-    font-size: 64px;
-    font-weight: 700;
-    line-height: 1.1;
-}
-
-.home-banner-description {
+    max-width: 690px;
     margin: 0;
-    color: white;
-
-    font-size: 20px;
-    line-height: 1.5;
+    font-size: clamp(3.3rem, 7vw, 6.8rem);
+    font-weight: 650;
+    line-height: .98;
+    letter-spacing: -.055em;
 }
-
-@media (max-width: 768px) {
-    .home-banner {
-        min-height: 420px;
-    }
-
-    .home-banner-content {
-        padding: 60px 24px !important;
-    }
-
-    .home-banner h1 {
-        font-size: 42px;
-    }
-
-    .home-banner-description {
-        font-size: 17px;
-    }
-
-    /* =========================
-   SHOP INTRO - BL-002
-========================= */
-
-    .shop-intro {
-        width: 100%;
-        background-color: #f7f6f2;
-        padding: 80px 24px;
-    }
-
-    .shop-intro-container {
-        width: 100%;
-        max-width: 1180px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .shop-intro-label {
-        margin-bottom: 10px;
-
-        color: #777;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 3px;
-    }
-
-    .shop-intro-title {
-        margin: 0;
-
-        color: #1d1d1d;
-        font-size: 38px;
-        font-weight: 600;
-        line-height: 1.2;
-    }
-
-    .shop-intro-line {
-        width: 54px;
-        height: 2px;
-
-        margin: 20px auto 24px;
-
-        background-color: #1d1d1d;
-    }
-
-    .shop-intro-description {
-        max-width: 760px;
-        margin: 0 auto;
-
-        color: #666;
-        font-size: 17px;
-        line-height: 1.8;
-    }
-
-    /* 3 feature cards */
-
-    .shop-intro-features {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-
-        margin-top: 55px;
-    }
-
-    .intro-feature {
-        position: relative;
-
-        padding: 34px 28px;
-
-        text-align: left;
-
-        background-color: #ffffff;
-        border: 1px solid #e8e6e1;
-        border-radius: 12px;
-
-        transition:
-                transform 0.25s ease,
-                box-shadow 0.25s ease;
-    }
-
-    .intro-feature:hover {
-        transform: translateY(-5px);
-
-        box-shadow:
-                0 12px 30px rgba(0, 0, 0, 0.07);
-    }
-
-    .intro-feature-number {
-        display: block;
-
-        margin-bottom: 18px;
-
-        color: #aaa;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 2px;
-    }
-
-    .intro-feature h3 {
-        margin: 0 0 10px;
-
-        color: #222;
-        font-size: 20px;
-        font-weight: 600;
-    }
-
-    .intro-feature p {
-        margin: 0;
-
-        color: #777;
-        font-size: 15px;
-        line-height: 1.65;
-    }
-
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 900px) {
-
-        .shop-intro {
-            padding: 65px 20px;
-        }
-
-        .shop-intro-features {
-            grid-template-columns: 1fr;
-            gap: 16px;
-
-            margin-top: 40px;
-        }
-
-        .intro-feature {
-            text-align: center;
-        }
-    }
-
-    @media (max-width: 600px) {
-
-        .shop-intro {
-            padding: 50px 18px;
-        }
-
-        .shop-intro-title {
-            font-size: 30px;
-        }
-
-        .shop-intro-description {
-            font-size: 15px;
-        }
-    }
-
-
-
-    
+.home-banner-description { max-width: 440px; margin: 26px 0 30px; font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.65; }
+.home-banner-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 34px;
+    min-height: 50px;
+    padding: 0 20px;
+    background: #f7f3eb;
+    color: #242a24;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform .2s ease, background .2s ease;
+}
+.home-banner-action:hover { transform: translateY(-2px); background: #fff; color: #242a24; }
+.home-banner-action:active { transform: translateY(0); }
+.home-banner-action:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+@keyframes home-enter {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 700px) {
+    .home-banner { min-height: 680px; align-items: flex-end; background-position: 62% center; }
+    .home-banner::after { background: linear-gradient(0deg, rgba(20, 28, 24, .82), rgba(20, 28, 24, .08) 75%); }
+    .home-banner-content { padding: 70px 20px !important; }
+    .home-banner h1 { max-width: 520px; }
+    .home-banner-action { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .home-banner-content { animation: none; }
+    .home-banner-action { transition: none; }
 }

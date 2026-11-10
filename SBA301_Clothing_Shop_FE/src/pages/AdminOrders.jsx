@@ -38,6 +38,10 @@ const editableStatuses = [
     { value: "CANCELLED", label: "Cancelled" },
 ];
 
+/*
+ * Nguyen Duy Khang
+ * Hiển thị và quản lý đơn hàng trong trang ADMIN.
+ */
 export default function AdminOrders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);

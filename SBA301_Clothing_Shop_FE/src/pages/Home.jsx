@@ -2,6 +2,7 @@ import HomeBanner from "../components/HomeBanner";
 import ShopIntro from "../components/ShopIntro";
 import CategorySection from "../components/CategorySection";
 import FeaturedProducts from "../components/FeaturedProducts";
+import "../css/HomeRefresh.css";
 
 /*
  * Nguyen Duy Khang
@@ -11,9 +12,9 @@ function Home() {
     return (
         <main>
             <HomeBanner />
-            <ShopIntro />
-            <FeaturedProducts />
             <CategorySection />
+            <FeaturedProducts />
+            <ShopIntro />
         </main>
     );
 }
