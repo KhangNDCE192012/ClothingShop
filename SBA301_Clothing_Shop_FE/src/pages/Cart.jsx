@@ -1,4 +1,8 @@
 
+/**
+ * Trang Giỏ hàng (Cart) của khách hàng.
+ * Hiển thị danh sách sản phẩm/biến thể đã chọn, cho phép tăng/giảm số lượng và tính tạm tính thành tiền.
+ */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getMyCart } from "../services/CartService";
@@ -6,6 +10,7 @@ import { getAccessToken } from "../services/AuthService";
 import { updateCartQuantity } from "../services/CartService";
 import "../css/Cart.css";
 
+/** Định dạng số tiền sang chuẩn tiền tệ VND */
 const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -14,11 +19,16 @@ const formatPrice = (price) =>
     }).format(Number(price) || 0);
 
 export default function Cart() {
+    // Danh sách các mục trong giỏ hàng
     const [items, setItems] = useState([]);
+    // Trạng thái đang tải giỏ hàng từ API
     const [loading, setLoading] = useState(true);
+    // Thông báo lỗi nếu có
     const [error, setError] = useState("");
+    // Lưu ID biến thể đang trong quá trình cập nhật số lượng
     const [updatingId, setUpdatingId] = useState(null);
 
+    // Tải thông tin giỏ hàng của người dùng khi component được mount
     useEffect(() => {
         let cancelled = false;
 
@@ -60,12 +70,19 @@ export default function Cart() {
         };
     }, []);
 
+    /** Trích xuất đối tượng biến thể từ item */
     const getVariant = (item) => item.variant ?? item;
+
+    /** Lấy ID của biến thể */
     const getVariantId = (item) => {
         const variant = getVariant(item);
         return variant.id;
     };
 
+    /**
+     * Xử lý tăng hoặc giảm số lượng biến thể trong giỏ hàng.
+     * Gửi yêu cầu PUT tới API và tải lại dữ liệu mới nhất.
+     */
     const handleQuantityChange = async (item, change) => {
         const variantId = getVariantId(item);
         const newQuantity = getQuantity(item) + change;
@@ -88,6 +105,7 @@ export default function Cart() {
         }
     };
 
+    /** Lấy tên sản phẩm của biến thể */
     const getProductName = (item) => {
         const variant = getVariant(item);
 
@@ -96,6 +114,7 @@ export default function Cart() {
         );
     };
 
+    /** Lấy đường dẫn hình ảnh đại diện của biến thể */
     const getImage = (item) => {
         const variant = getVariant(item);
 
@@ -105,15 +124,19 @@ export default function Cart() {
         );
     };
 
+    /** Lấy đơn giá của biến thể */
     const getPrice = (item) => {
         const variant = getVariant(item);
         return Number(variant?.price ?? item?.price ?? 0);
     };
 
+    /** Lấy số lượng đặt mua của mục */
     const getQuantity = (item) => Number(item.quantity ?? 0);
 
+    // Tổng số loại biến thể trong giỏ
     const totalQuantity = items.length;
 
+    // Tổng số tiền tạm tính của giỏ hàng
     const subtotal = items.reduce(
         (sum, item) => sum + getPrice(item) * getQuantity(item),
         0

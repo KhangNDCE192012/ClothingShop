@@ -1,12 +1,16 @@
+/**
+ * Trang Chi tiết Sản phẩm (Product Detail).
+ * Hiển thị hình ảnh, thông tin sản phẩm, danh sách biến thể (Size, Color), số lượng tồn kho
+ * và hỗ trợ khách hàng chọn biến thể để thêm vào giỏ hàng (BL-011, BL-014).
+ */
 import {useEffect, useMemo, useState} from "react";
-import {Link, useParams} from "react-router-dom";
+import {Link, useParams, useNavigate} from "react-router-dom";
 import {getProductById} from "../services/ProductService";
 import {addToCart} from "../services/CartService.jsx";
 import "../css/ProductDetail.css";
-import { useNavigate } from "react-router-dom";
 import { getAccessToken } from "../services/AuthService";
 
-
+/** Định dạng số tiền sang chuẩn VND */
 const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -14,20 +18,27 @@ const formatPrice = (price) =>
         maximumFractionDigits: 0,
     }).format(price ?? 0);
 
-/*
- * Trang chi tiết lấy tên Product và Variant thực tế từ GET /api/products/{id}.
- */
 export default function ProductDetail() {
     const {id} = useParams();
     const navigate = useNavigate();
+
+    // Danh sách các biến thể của sản phẩm
     const [variants, setVariants] = useState([]);
+    // Thông tin chi tiết sản phẩm
     const [product, setProduct] = useState(null);
+    // Biến thể đang được người dùng lựa chọn (size, color, ảnh, tồn kho)
     const [selected, setSelected] = useState(null);
+    // Số lượng đặt mua
     const [quantity, setQuantity] = useState(1);
+    // Trạng thái đang tải dữ liệu
     const [loading, setLoading] = useState(true);
+    // Thông báo lỗi
     const [error, setError] = useState("");
 
-
+    /**
+     * Xử lý thêm sản phẩm đã chọn vào giỏ hàng của người dùng.
+     * Kiểm tra trạng thái đăng nhập, gọi API addToCart và thông báo kết quả.
+     */
     const handleAddToCart = async () => {
         try {
             const token = getAccessToken();
@@ -48,6 +59,7 @@ export default function ProductDetail() {
         }
     };
 
+    // Tải dữ liệu sản phẩm và các biến thể theo ID
     useEffect(() => {
         let active = true;
 
@@ -79,22 +91,26 @@ export default function ProductDetail() {
         };
     }, [id]);
 
+    // Danh sách các Size độc nhất từ các biến thể
     const sizes = useMemo(
         () => [...new Set(variants.map((v) => v.size).filter(Boolean))],
         [variants]
     );
 
+    // Danh sách các Color độc nhất từ các biến thể
     const colors = useMemo(
         () => [...new Set(variants.map((v) => v.color).filter(Boolean))],
         [variants]
     );
 
+    /** Chọn biến thể cụ thể */
     function selectVariant(variant) {
         if (!variant || variant.quantity <= 0) return;
         setSelected(variant);
         setQuantity(1);
     }
 
+    /** Xử lý khi người dùng chọn kích cỡ (Size) */
     function chooseSize(size) {
         const match = variants.find(
             (v) =>
@@ -110,6 +126,7 @@ export default function ProductDetail() {
         selectVariant(match || fallback);
     }
 
+    /** Xử lý khi người dùng chọn màu sắc (Color) */
     function chooseColor(color) {
         const match = variants.find(
             (v) =>

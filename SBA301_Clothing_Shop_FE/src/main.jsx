@@ -1,3 +1,7 @@
+/**
+ * Điểm khởi chạy của ứng dụng React Frontend (Vite).
+ * Khởi tạo React Root, thiết lập BrowserRouter và bọc toàn bộ component bên trong AuthProvider.
+ */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

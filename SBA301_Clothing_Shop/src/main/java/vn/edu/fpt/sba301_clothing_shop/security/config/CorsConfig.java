@@ -10,9 +10,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+/**
+ * Cấu hình chia sẻ tài nguyên nguồn gốc chéo (CORS Configuration).
+ * Cho phép ứng dụng Frontend (React Vite chạy tại localhost:5173 hoặc các cổng localhost khác)
+ * gửi request và nhận phản hồi từ Backend an toàn.
+ */
 @Configuration
 public class CorsConfig {
 
+    /**
+     * Cấu hình CORS cho Spring Security Filter Chain.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -26,6 +34,9 @@ public class CorsConfig {
         return source;
     }
 
+    /**
+     * Cấu hình CORS cho Spring Web MVC.
+     */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

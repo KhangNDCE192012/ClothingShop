@@ -1,3 +1,7 @@
+/**
+ * Component giới thiệu về cửa hàng (About Us / Shop Intro).
+ * Hiển thị tôn chỉ thời trang, cam kết chất lượng và định hướng phong cách của Clothing Shop trên trang chủ.
+ */
 import "../css/ShopIntro.css";
 
 function ShopIntro() {

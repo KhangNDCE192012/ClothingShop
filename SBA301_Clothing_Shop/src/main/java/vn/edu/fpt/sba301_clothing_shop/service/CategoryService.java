@@ -37,6 +37,11 @@ public class CategoryService {
         this.variantRepository = variantRepository;
     }
 
+    /**
+     * Lấy toàn bộ danh sách danh mục cùng với ảnh đại diện và mức giá thấp nhất của các sản phẩm thuộc danh mục.
+     *
+     * @return danh sách CategoryResponse
+     */
     public List<CategoryResponse> getAllCategories() {
 
         List<Category> categories = categoryRepository.findAll();

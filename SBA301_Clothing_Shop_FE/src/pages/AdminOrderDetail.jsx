@@ -1,12 +1,18 @@
 
+/**
+ * Trang Chi tiết Đơn hàng dành cho Quản trị viên (ADMIN).
+ * Hiển thị đầy đủ thông tin khách hàng, địa chỉ giao hàng, ngày tạo, trạng thái và danh sách các sản phẩm (biến thể, kích cỡ, màu sắc, số lượng, đơn giá).
+ */
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getOrderById } from "../services/OrderService";
 import "../css/AdminOrderDetail.css";
 
+/** Định dạng giá trị tiền tệ */
 const formatMoney = (value) =>
     Number(value ?? 0).toLocaleString("vi-VN") + " ₫";
 
+/** Định dạng chuỗi ngày tháng sang chuẩn Việt Nam */
 const formatDate = (value) => {
     if (!value) return "—";
 
@@ -17,6 +23,7 @@ const formatDate = (value) => {
         : date.toLocaleString("vi-VN");
 };
 
+/** Bản đồ ánh xạ mã trạng thái sang nhãn tiếng Việt */
 const statusLabels = {
     PENDING: "Chờ xác nhận",
     CONFIRMED: "Đã xác nhận",
@@ -28,6 +35,7 @@ const statusLabels = {
     PAID: "Đã thanh toán",
 };
 
+/** Trích xuất danh sách chi tiết các mặt hàng trong đơn */
 function getItems(order) {
     const candidates = [
         order?.orderDetails,
@@ -40,10 +48,12 @@ function getItems(order) {
     return candidates.find(Array.isArray) ?? [];
 }
 
+/** Lấy biến thể sản phẩm */
 function getVariant(item) {
     return item?.variant ?? item?.productVariant ?? {};
 }
 
+/** Lấy tên sản phẩm từ mục chi tiết hoặc biến thể */
 function getProductName(item, variant) {
     return (
         variant?.product?.name ??
@@ -54,6 +64,7 @@ function getProductName(item, variant) {
     );
 }
 
+/** Lấy ID biến thể */
 function getVariantId(item, variant) {
     return (
         variant?.id ??
@@ -64,6 +75,7 @@ function getVariantId(item, variant) {
     );
 }
 
+/** Lấy tên kích cỡ (Size) */
 function getSize(item, variant) {
     const size = variant?.size ?? item?.size;
 
@@ -74,6 +86,7 @@ function getSize(item, variant) {
     return size?.sizeName ?? size?.name ?? item?.sizeName ?? "—";
 }
 
+/** Lấy tên màu sắc (Color) */
 function getColor(item, variant) {
     const color = variant?.color ?? item?.color;
 
@@ -84,6 +97,7 @@ function getColor(item, variant) {
     return color?.colorName ?? color?.name ?? item?.colorName ?? "—";
 }
 
+/** Lấy đơn giá của mặt hàng */
 function getItemPrice(item, variant) {
     return Number(
         item?.price ??
@@ -94,9 +108,12 @@ function getItemPrice(item, variant) {
 }
 
 function AdminOrderDetail() {
+    // Lấy ID đơn hàng từ URL params
     const { id } = useParams();
 
+    // Dữ liệu đơn hàng chi tiết
     const [order, setOrder] = useState(null);
+    // Trạng thái đang tải dữ liệu
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 

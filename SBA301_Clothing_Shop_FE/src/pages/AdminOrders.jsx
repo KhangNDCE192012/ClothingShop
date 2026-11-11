@@ -1,4 +1,9 @@
 
+/**
+ * Trang Quản lý Đơn hàng dành cho Quản trị viên (ADMIN).
+ * Cung cấp các chức năng xem danh sách đơn hàng, tìm kiếm, lọc theo trạng thái,
+ * cập nhật trạng thái đơn hàng và xóa mềm đơn hàng (BL-019, BL-020, BL-021, BL-022).
+ */
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -8,6 +13,7 @@ import {
 } from "../services/OrderService";
 import "../css/AdminOrders.css";
 
+/** Định dạng số tiền sang chuẩn VND */
 const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -15,8 +21,10 @@ const formatPrice = (price) =>
         maximumFractionDigits: 0,
     }).format(Number(price) || 0);
 
+/** Lấy mã định danh đơn hàng */
 const getOrderId = (order) => order.id ?? order.orderId;
 
+/** Lấy tên khách hàng hoặc người nhận hàng */
 const getCustomerName = (order) =>
     order.user?.fullName ??
     order.user?.username ??
@@ -24,12 +32,15 @@ const getCustomerName = (order) =>
     order.recipientName ??
     "Khách hàng";
 
+/** Lấy tổng giá trị đơn hàng */
 const getTotal = (order) =>
     order.totalAmount ?? order.totalPrice ?? order.total ?? 0;
 
+/** Chuẩn hóa trạng thái đơn hàng sang chữ hoa */
 const getStatus = (order) =>
     String(order.status ?? "PENDING").toUpperCase();
 
+/** Danh sách các trạng thái có thể cập nhật */
 const editableStatuses = [
     { value: "PENDING", label: "Pending" },
     { value: "CONFIRMED", label: "Confirmed" },
@@ -38,23 +49,27 @@ const editableStatuses = [
     { value: "CANCELLED", label: "Cancelled" },
 ];
 
-/*
- * Nguyen Duy Khang
- * Hiển thị và quản lý đơn hàng trong trang ADMIN.
- */
 export default function AdminOrders() {
+    // Danh sách đơn hàng nhận từ backend
     const [orders, setOrders] = useState([]);
+    // Trạng thái đang tải dữ liệu
     const [loading, setLoading] = useState(true);
+    // Lỗi khi tải dữ liệu
     const [error, setError] = useState("");
+    // Từ khóa tìm kiếm theo mã đơn hoặc tên khách hàng
     const [keyword, setKeyword] = useState("");
+    // Bộ lọc trạng thái đơn hàng (ALL, PENDING, CONFIRMED, ...)
     const [statusFilter, setStatusFilter] = useState("ALL");
+    // Danh sách ID các đơn hàng đang trong tiến trình cập nhật trạng thái
     const [updatingIds, setUpdatingIds] = useState([]);
+    // Thông báo cập nhật thành công
     const [updateMessage, setUpdateMessage] = useState("");
+    // Thông báo lỗi khi cập nhật
     const [updateError, setUpdateError] = useState("");
 
     const navigate = useNavigate();
 
-
+    /** Gọi API tải danh sách toàn bộ đơn hàng */
     async function loadOrders() {
         setLoading(true);
         setError("");

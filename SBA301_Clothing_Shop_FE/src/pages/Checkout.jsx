@@ -1,4 +1,8 @@
 
+/**
+ * Trang Đặt hàng / Thanh toán (Checkout).
+ * Cho phép khách hàng nhập thông tin giao nhận, xem lại tóm tắt đơn hàng và gửi yêu cầu tạo đơn hàng (BL-017, BL-018).
+ */
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMyCart } from "../services/CartService";
@@ -7,6 +11,7 @@ import { getCurrentUser } from "../services/UserService";
 import { createOrder } from "../services/OrderService";
 import "../css/Checkout.css";
 
+/** Định dạng số tiền sang chuẩn tiền tệ VND */
 const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -18,11 +23,16 @@ const formatPrice = (price) =>
 export default function Checkout() {
     const navigate = useNavigate();
 
+    // Danh sách sản phẩm trong giỏ hàng cần thanh toán
     const [items, setItems] = useState([]);
+    // Trạng thái tải dữ liệu ban đầu
     const [loading, setLoading] = useState(true);
+    // Thông báo lỗi
     const [error, setError] = useState("");
+    // Cờ trạng thái đang gửi form đặt hàng
     const [submitting, setSubmitting] = useState(false);
 
+    // Dữ liệu form thông tin giao hàng
     const [form, setForm] = useState({
         fullName: "",
         phone: "",
@@ -139,6 +149,7 @@ export default function Checkout() {
         };
     }, [navigate]);
 
+    /** Cập nhật trường dữ liệu trong form thông tin giao hàng */
     const handleChange = (event) => {
         const { name, value } = event.target;
 
@@ -148,7 +159,10 @@ export default function Checkout() {
         }));
     };
 
-    // Chỉ có một handleSubmit duy nhất.
+    /**
+     * Xử lý xác thực dữ liệu và gửi yêu cầu tạo đơn hàng (Checkout).
+     * Sau khi thành công, chuyển hướng người dùng tới trang xác nhận đơn hàng.
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
         setError("");

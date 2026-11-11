@@ -17,6 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Service xử lý các nghiệp vụ Đơn hàng (Order Service).
+ * Bao gồm: đặt hàng (checkout COD), xem danh sách đơn hàng cho Admin, xem chi tiết và cập nhật trạng thái đơn hàng.
+ */
 @Service
 public class OrderService {
 
@@ -25,6 +29,7 @@ public class OrderService {
     private final VariantRepository variantRepository;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+
     public OrderService(
             OrderRepository orderRepository,
             OrderDetailRepository orderDetailRepository,
@@ -38,7 +43,15 @@ public class OrderService {
         this.cartRepository = cartRepository;
     }
 
-
+    /**
+     * BL-017: Thực hiện quy trình đặt hàng và thanh toán COD.
+     * Kiểm tra hợp lệ dữ liệu, tính toán tiền theo giá DB, tạo Order và OrderDetail,
+     * đồng thời tự động xóa các sản phẩm đã đặt khỏi giỏ hàng.
+     *
+     * @param username Tên đăng nhập của người đặt
+     * @param request DTO chứa địa chỉ, phương thức thanh toán và danh sách sản phẩm
+     * @return CheckoutResponse thông tin đơn hàng vừa đặt thành công
+     */
     @Transactional
     public CheckoutResponse checkout(
             String username,
@@ -49,8 +62,6 @@ public class OrderService {
         );
 
         Integer userId = user.getId();
-
-
 
         if (!"COD".equalsIgnoreCase(request.getPaymentMethod())) {
             throw new IllegalArgumentException(
@@ -73,7 +84,7 @@ public class OrderService {
         Set<Integer> variantIds = new HashSet<>();
         BigDecimal subtotal = BigDecimal.ZERO;
 
-        // Tính lại tiền theo giá trong database.
+        // Tính lại tiền theo giá trong database để chống gian lận giá từ client.
         for (CheckoutRequest.CheckoutItemRequest item
                 : request.getItems()) {
 
@@ -99,49 +110,36 @@ public class OrderService {
 
             if (price == null || price.signum() < 0) {
                 throw new IllegalArgumentException(
-                        "Giá sản phẩm không hợp lệ.");
+                        "Giá của variant không hợp lệ.");
             }
 
-            subtotal = subtotal.add(
-                    price.multiply(
-                            BigDecimal.valueOf(item.getQuantity())));
+            BigDecimal itemTotal = price.multiply(
+                    BigDecimal.valueOf(item.getQuantity())
+            );
+
+            subtotal = subtotal.add(itemTotal);
         }
 
-        // Phí vận chuyển mẫu: miễn phí từ 1 triệu đồng.
-        BigDecimal shippingFee =
-                subtotal.compareTo(new BigDecimal("1000000")) >= 0
-                        ? BigDecimal.ZERO
-                        : new BigDecimal("30000");
-
+        BigDecimal shippingFee = BigDecimal.valueOf(30000);
         BigDecimal total = subtotal.add(shippingFee);
 
-        // Tạo Order.
         Order order = new Order();
         order.setUser(user);
+        order.setReceiverName(request.getReceiverName());
+        order.setReceiverPhone(request.getReceiverPhone());
+        order.setShippingAddress(request.getShippingAddress());
         order.setOrderDate(LocalDateTime.now());
-        order.setTotalPrice(total);
+        order.setTotal(total);
         order.setStatus("PENDING");
-
-        order.setRecipientName(user.getFullName());
-        order.setRecipientPhone(user.getPhone());
-        order.setRecipientEmail(user.getEmail());
-        order.setShippingAddress(
-                request.getShippingAddress().trim());
-        order.setShippingFee(shippingFee);
-        order.setPaymentMethod("COD");
-        order.setNote(request.getNote());
 
         Order savedOrder = orderRepository.save(order);
 
-        // Tạo OrderDetail theo giá lấy từ database.
         for (CheckoutRequest.CheckoutItemRequest item
                 : request.getItems()) {
 
             Variant variant = variantRepository
                     .findById(item.getVariantId())
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Không tìm thấy variant ID: "
-                                    + item.getVariantId()));
+                    .orElseThrow();
 
             OrderDetail detail = new OrderDetail();
             detail.setOrder(savedOrder);
@@ -152,7 +150,7 @@ public class OrderService {
             orderDetailRepository.save(detail);
         }
 
-        // Chỉ xóa những sản phẩm đã được đặt hàng thành công.
+        // Chỉ xóa những sản phẩm đã được đặt hàng thành công khỏi giỏ hàng.
         List<Integer> orderedVariantIds = request.getItems()
                 .stream()
                 .map(CheckoutRequest.CheckoutItemRequest::getVariantId)
@@ -171,7 +169,11 @@ public class OrderService {
         );
     }
 
-
+    /**
+     * BL-019: Lấy toàn bộ đơn hàng trong hệ thống (loại trừ các đơn có trạng thái DELETED).
+     *
+     * @return Danh sách Order
+     */
     public List<Order> getAllOrder() {
         return orderRepository.findAll()
                 .stream()
@@ -180,7 +182,12 @@ public class OrderService {
                 .toList();
     }
 
-
+    /**
+     * BL-020: Lấy chi tiết các sản phẩm thuộc một đơn hàng theo order ID.
+     *
+     * @param id Mã định danh đơn hàng
+     * @return Danh sách chi tiết đơn hàng List<OrderDetail>
+     */
     public List<OrderDetail> getOrderById(Integer id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
                 "Không tìm thấy Order ID: "
@@ -193,6 +200,13 @@ public class OrderService {
         return orderDetailRepository.findByOrder_Id(id);
     }
 
+    /**
+     * BL-021: Cập nhật trạng thái đơn hàng (PENDING, CONFIRMED, SHIPPING, COMPLETED, CANCELLED, DELETED).
+     *
+     * @param id Mã định danh đơn hàng
+     * @param orderStatusRequest DTO chứa trạng thái mới
+     * @return Order sau khi cập nhật
+     */
     public Order updateOrderStatus(Integer id, OrderStatusRequest orderStatusRequest) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
                 "Không tìm thấy Order ID: "

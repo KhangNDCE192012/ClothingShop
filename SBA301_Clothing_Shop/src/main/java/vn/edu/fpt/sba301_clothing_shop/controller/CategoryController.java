@@ -11,7 +11,8 @@ import vn.edu.fpt.sba301_clothing_shop.service.CategoryService;
 import java.util.List;
 
 /**
- * Cung cấp API đọc công khai và API quản lý Category dành cho ADMIN BL-012.
+ * Controller quản lý danh mục sản phẩm (Category Management).
+ * Cung cấp API đọc công khai (Public) và API ghi dành riêng cho ADMIN (BL-012, BL-028).
  */
 @RestController
 @RequestMapping("/api/categories")
@@ -25,6 +26,13 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    /**
+     * BL-003 & BL-004: Lấy danh sách toàn bộ danh mục sản phẩm kèm sản phẩm mẫu.
+     * Phương thức: GET /api/categories
+     * Quyền hạn: Công khai (PermitAll)
+     *
+     * @return Danh sách CategoryResponse
+     */
     @GetMapping
     public ResponseEntity<List<CategoryResponse>>
     getAllCategories() {
@@ -34,6 +42,14 @@ public class CategoryController {
         );
     }
 
+    /**
+     * BL-012: Thêm danh mục sản phẩm mới (chỉ Admin).
+     * Phương thức: POST /api/categories
+     * Quyền hạn: ADMIN
+     *
+     * @param request DTO chứa tên danh mục mới
+     * @return HTTP 201 Created cùng CategoryResponse vừa tạo
+     */
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(
             @Valid @RequestBody CategoryRequest request
@@ -43,6 +59,15 @@ public class CategoryController {
                 .body(categoryService.createCategory(request));
     }
 
+    /**
+     * BL-012: Chỉnh sửa tên danh mục sản phẩm theo ID (chỉ Admin).
+     * Phương thức: PUT /api/categories/{id}
+     * Quyền hạn: ADMIN
+     *
+     * @param id Mã định danh danh mục
+     * @param request DTO chứa tên mới
+     * @return CategoryResponse sau khi cập nhật
+     */
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable Integer id,
@@ -51,6 +76,14 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 
+    /**
+     * BL-012: Xóa danh mục sản phẩm theo ID (chỉ Admin, chỉ xóa khi chưa có sản phẩm nào).
+     * Phương thức: DELETE /api/categories/{id}
+     * Quyền hạn: ADMIN
+     *
+     * @param id Mã định danh danh mục
+     * @return HTTP 204 No Content
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
         categoryService.deleteCategory(id);

@@ -1,3 +1,7 @@
+/**
+ * Component hiển thị Banner chính tại Trang chủ (Home).
+ * Giới thiệu thông điệp thời trang của cửa hàng và hình ảnh đại diện thương hiệu.
+ */
 import { Container } from "react-bootstrap";
 import Banner from "../assets/Banner.png";
 import "../css/Home.css";

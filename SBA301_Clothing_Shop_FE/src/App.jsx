@@ -1,4 +1,9 @@
 
+/**
+ * Component gốc của ứng dụng Frontend SBA301 Clothing Shop.
+ * Định tuyến toàn bộ các trang công khai (Home, ProductDetail, Cart, Checkout, Login, Register)
+ * và các trang quản trị được bảo vệ bởi ProtectedRoute (AdminProducts, AdminProductCreate, AdminUsers, AdminOrders, AdminOrderDetail).
+ */
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProductDetail from "./pages/ProductDetail";
 import AdminUsers from "./pages/AdminUsers";
