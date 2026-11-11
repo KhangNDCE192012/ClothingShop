@@ -46,6 +46,9 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public List<UserResponse> getCustomers() {
+        // 1. Truy vấn Database lấy toàn bộ User có Role là CUSTOMER, sắp xếp giảm dần theo ngày tạo (mới nhất lên đầu)
+        // 2. Chuyển đổi (map) từng Entity User sang DTO UserResponse để ẩn trường password
+        // 3. Thu thập thành danh sách List<UserResponse> và trả về
         return userRepository
                 .findAllByRoleNameIgnoreCaseOrderByCreatedAtDesc(CUSTOMER_ROLE)
                 .stream()
@@ -61,8 +64,11 @@ public class UserService {
      */
     @Transactional
     public UserResponse lockCustomer(Integer id) {
+        // 1. Tìm tài khoản khách hàng theo ID (kiểm tra tồn tại và role là CUSTOMER)
         User customer = findCustomer(id);
+        // 2. Cập nhật thuộc tính status của Entity thành BANNED
         customer.setStatus(BLOCKED_STATUS);
+        // 3. Lưu bản ghi đã cập nhật vào Database và chuyển đổi sang DTO trả về
         return UserResponse.from(userRepository.save(customer));
     }
 
@@ -75,8 +81,10 @@ public class UserService {
      */
     @Transactional
     public void deleteCustomer(Integer id) {
+        // 1. Tìm kiếm khách hàng theo ID
         User customer = findCustomer(id);
 
+        // 2. Kiểm tra ràng buộc nghiệp vụ: nếu khách hàng đã có đơn hàng thì không được xóa (ném lỗi 409 Conflict)
         if (userRepository.countOrdersByUserId(id) > 0) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -84,7 +92,9 @@ public class UserService {
             );
         }
 
+        // 3. Xóa các mục giỏ hàng liên kết với user trong bảng Carts trước
         userRepository.deleteCartsByUserId(id);
+        // 4. Xóa bản ghi người dùng khỏi bảng Users
         userRepository.delete(customer);
     }
 

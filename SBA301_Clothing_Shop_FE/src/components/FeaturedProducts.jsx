@@ -1,3 +1,7 @@
+/**
+ * Component hiển thị danh sách sản phẩm nổi bật (Featured Products) trên Trang chủ.
+ * Lọc lấy tối đa 8 sản phẩm có trạng thái ACTIVE mới nhất (BL-003, BL-005).
+ */
 import {useEffect, useMemo, useState} from "react";
 import {Link} from "react-router-dom";
 import {getProducts} from "../services/ProductService";
@@ -8,43 +12,55 @@ import "../css/FeaturedProducts.css";
  * Hiển thị tối đa 8 sản phẩm ACTIVE mới nhất và điều hướng đến trang sản phẩm.
  */
 export default function FeaturedProducts() {
+    // State lưu trữ danh sách sản phẩm lấy từ backend
     const [products, setProducts] = useState([]);
+    // State quản lý trạng thái đang nạp dữ liệu
     const [loading, setLoading] = useState(true);
+    // State lưu thông báo lỗi nếu tải thất bại
     const [error, setError] = useState("");
 
-    // Tải dữ liệu một lần khi khu vực sản phẩm nổi bật xuất hiện trên Home.
+    // Hook nạp dữ liệu sản phẩm từ API khi component xuất hiện trên giao diện
     useEffect(() => {
+        // Cờ active ngăn chặn cập nhật state sau khi component bị unmount
         let active = true;
 
+        // Gọi API getProducts() lấy danh sách sản phẩm
         getProducts()
             .then((data) => {
+                // Đảm bảo dữ liệu nhận về là mảng và cập nhật vào state
                 if (active) setProducts(Array.isArray(data) ? data : []);
             })
             .catch((requestError) => {
+                // Bắt và ghi nhận lỗi nếu không gọi được API
                 if (active) {
                     setError(requestError.message || "Không thể tải sản phẩm nổi bật.");
                 }
             })
             .finally(() => {
+                // Tắt trạng thái loading khi hoàn tất
                 if (active) setLoading(false);
             });
 
+        // Hủy cờ active khi component bị tháo dỡ
         return () => {
             active = false;
         };
     }, []);
 
-    // Project chưa có cột featured, vì vậy chọn 8 sản phẩm ACTIVE mới nhất.
+    // Lọc ra tối đa 8 sản phẩm đang bán (ACTIVE) để làm sản phẩm nổi bật
     const featuredProducts = useMemo(
         () => products
-            .filter((product) => String(product.status).toUpperCase() === "ACTIVE")
-            .slice(0, 8),
+            .filter((product) => String(product.status).toUpperCase() === "ACTIVE") // Chỉ lấy sản phẩm ACTIVE
+            .slice(0, 8), // Giới hạn lấy tối đa 8 sản phẩm
         [products]
     );
 
+    // Hàm định dạng số tiền sang chuẩn VND
     const formatPrice = (price) => {
+        // Nếu giá trị chưa có thì trả về thông báo 'Đang cập nhật'
         if (price === null || price === undefined) return "Đang cập nhật";
 
+        // Định dạng số tiền có ký hiệu ₫ và phân tách hàng nghìn
         return new Intl.NumberFormat("vi-VN", {
             style: "currency",
             currency: "VND",

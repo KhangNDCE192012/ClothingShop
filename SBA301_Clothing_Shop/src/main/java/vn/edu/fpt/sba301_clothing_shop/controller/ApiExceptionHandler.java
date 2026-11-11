@@ -23,9 +23,12 @@ public class ApiExceptionHandler {
      */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException exception) {
+        // 1. Trích xuất lý do lỗi (reason) từ exception, nếu null thì dùng thông báo mặc định
         String message = exception.getReason() == null
                 ? "Yêu cầu không thể thực hiện"
                 : exception.getReason();
+
+        // 2. Trả về đối tượng phản hồi HTTP với mã trạng thái lỗi tương ứng và body JSON {"message": "..."}
         return ResponseEntity
                 .status(exception.getStatusCode())
                 .body(Map.of("message", message));
@@ -39,12 +42,15 @@ public class ApiExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException exception) {
+        // 1. Lấy danh sách lỗi trường (field errors) từ bindingResult và chọn lỗi đầu tiên
         String message = exception.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(error -> error.getDefaultMessage() == null
                         ? "Dữ liệu đăng nhập không hợp lệ"
                         : error.getDefaultMessage())
                 .orElse("Dữ liệu đăng nhập không hợp lệ");
+
+        // 2. Trả về mã lỗi HTTP 400 Bad Request cùng thông báo vi phạm cụ thể
         return ResponseEntity.badRequest().body(Map.of("message", message));
     }
 }

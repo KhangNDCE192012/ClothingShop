@@ -60,18 +60,25 @@ export default function AdminUsers() {
     const [editSaving, setEditSaving] = useState(false);
 
     /**
-     * BL-031: Hàm tải danh sách khách hàng từ backend thông qua getCustomers().
+     * BL-031: Hàm tải danh sách khách hàng từ backend thông qua API getCustomers().
+     * Thiết lập trạng thái loading và bắt lỗi chi tiết nếu có.
      */
     async function loadCustomers() {
+        // Bật cờ trạng thái đang tải dữ liệu
         setLoading(true);
+        // Xóa thông báo lỗi cũ
         setError("");
 
         try {
+            // Gọi hàm getCustomers() gửi request GET /api/users kèm token Admin
             const data = await getCustomers();
+            // Cập nhật danh sách khách hàng vào state (đảm bảo luôn là mảng)
             setCustomers(Array.isArray(data) ? data : []);
         } catch (err) {
+            // Hiển thị thông báo lỗi nếu API gặp sự cố
             setError(err.message || "Đã xảy ra lỗi khi tải dữ liệu.");
         } finally {
+            // Tắt cờ trạng thái đang tải dữ liệu
             setLoading(false);
         }
     }
@@ -82,17 +89,22 @@ export default function AdminUsers() {
     useEffect(() => {
         let active = true;
 
+        // Gọi API nạp danh sách khách hàng
         getCustomers()
             .then((data) => {
+                // Nếu component vẫn active thì nạp dữ liệu vào state
                 if (active) setCustomers(Array.isArray(data) ? data : []);
             })
             .catch((err) => {
+                // Nếu có lỗi, ghi nhận thông báo lỗi
                 if (active) setError(err.message || "Đã xảy ra lỗi khi tải dữ liệu.");
             })
             .finally(() => {
+                // Tắt trạng thái loading khi hoàn tất
                 if (active) setLoading(false);
             });
 
+        // Cleanup: Hủy cờ active khi component bị unmount
         return () => {
             active = false;
         };
@@ -102,6 +114,7 @@ export default function AdminUsers() {
      * BL-031: Trích xuất danh sách các trạng thái duy nhất có trong dữ liệu khách hàng.
      */
     const statuses = useMemo(
+        // Lấy các giá trị trạng thái không trùng lặp và loại bỏ giá trị rỗng/null
         () => [...new Set(customers.map((customer) => customer.status).filter(Boolean))],
         [customers]
     );
@@ -110,10 +123,14 @@ export default function AdminUsers() {
      * BL-031: Lọc danh sách khách hàng dựa trên từ khóa tìm kiếm và trạng thái đang chọn.
      */
     const filteredCustomers = useMemo(() => {
+        // Chuẩn hóa từ khóa tìm kiếm (loại bỏ khoảng trắng, đổi thành chữ thường)
         const keyword = normalize(search.trim());
 
+        // Lọc từng khách hàng trong danh sách
         return customers.filter((customer) => {
+            // Kiểm tra trạng thái: nếu chọn 'ALL' hoặc trùng khớp trạng thái thì thỏa mãn
             const matchesStatus = status === "ALL" || customer.status === status;
+            // Kiểm tra từ khóa: nếu không nhập từ khóa hoặc tên/username/email/phone chứa từ khóa
             const matchesSearch = !keyword || [
                 customer.fullName,
                 customer.username,
@@ -121,55 +138,73 @@ export default function AdminUsers() {
                 customer.phone,
             ].some((value) => normalize(value).includes(keyword));
 
+            // Trả về true nếu thỏa mãn cả hai điều kiện
             return matchesStatus && matchesSearch;
         });
     }, [customers, search, status]);
 
     /**
      * BL-032: Khóa tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
+     * Gửi yêu cầu PATCH /api/users/{id}/lock lên server.
      */
     async function handleLock(customer) {
+        // 1. Hiển thị hộp thoại xác nhận của trình duyệt
         const confirmed = window.confirm(
             `Khóa tài khoản “${customer.username}”? Tài khoản này sẽ bị hạn chế sử dụng hệ thống.`
         );
 
+        // 2. Nếu người dùng chọn Hủy (Cancel) thì dừng thao tác
         if (!confirmed) return;
 
+        // 3. Đánh dấu thao tác đang thực thi trên ID này để vô hiệu hóa nút bấm
         setPendingAction({id: customer.id, type: "lock"});
+        // 4. Xóa lỗi thao tác trước đó
         setActionError("");
 
         try {
+            // 5. Gửi request PATCH tới server để cập nhật status = BANNED
             const updatedCustomer = await lockCustomer(customer.id);
+            // 6. Cập nhật đối tượng khách hàng mới trực tiếp vào state mà không cần nạp lại trang
             setCustomers((current) => current.map((item) =>
                 item.id === updatedCustomer.id ? updatedCustomer : item
             ));
         } catch (err) {
+            // 7. Ghi nhận thông báo lỗi nếu có
             setActionError(err.message || "Không thể khóa tài khoản.");
         } finally {
+            // 8. Đặt lại trạng thái pendingAction về null khi hoàn tất
             setPendingAction(null);
         }
     }
 
     /**
      * BL-033: Xóa vĩnh viễn tài khoản khách hàng sau khi xác nhận hộp thoại confirm.
+     * Gửi yêu cầu DELETE /api/users/{id} lên server.
      */
     async function handleDelete(customer) {
+        // 1. Hiển thị cảnh báo xác nhận xóa vĩnh viễn
         const confirmed = window.confirm(
             `Xóa vĩnh viễn tài khoản “${customer.username}”? Thao tác này không thể hoàn tác.`
         );
 
+        // 2. Nếu người dùng không đồng ý thì thoát
         if (!confirmed) return;
 
+        // 3. Đánh dấu thao tác đang thực thi
         setPendingAction({id: customer.id, type: "delete"});
+        // 4. Xóa lỗi thao tác cũ
         setActionError("");
 
         try {
+            // 5. Gọi API DELETE /api/users/{id}
             await deleteCustomer(customer.id);
-            // Xóa khách hàng khỏi mảng state hiện tại
+            // 6. Lọc bỏ khách hàng đã bị xóa ra khỏi mảng state hiện tại
             setCustomers((current) => current.filter((item) => item.id !== customer.id));
         } catch (err) {
+            // 7. Bắt lỗi (ví dụ khách hàng đã có đơn hàng -> server báo 409 Conflict)
             setActionError(err.message || "Không thể xóa tài khoản.");
         } finally {
+            // 8. Reset trạng thái pendingAction
             setPendingAction(null);
         }
     }
@@ -211,33 +246,36 @@ export default function AdminUsers() {
      * BL-034: Validate dữ liệu form phía client và gửi request cập nhật lên server.
      */
     async function handleSaveEdit(e) {
+        // Ngăn chặn hành vi reload trang mặc định của form HTML
         e.preventDefault();
+        // Xóa thông báo lỗi cũ
         setEditError("");
 
+        // Cắt bỏ khoảng trắng dư thừa
         const trimmedFullName = editForm.fullName.trim();
         const trimmedEmail = editForm.email.trim();
         const trimmedPhone = editForm.phone.trim();
 
-        // Kiểm tra bắt buộc email
+        // 1. Kiểm tra trường email bắt buộc
         if (!trimmedEmail) {
             setEditError("Email không được để trống.");
             return;
         }
 
-        // Kiểm tra định dạng email và độ dài tối đa
+        // 2. Kiểm tra định dạng email và độ dài tối đa 100 ký tự
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
         if (!emailRegex.test(trimmedEmail) || trimmedEmail.length > 100) {
             setEditError("Email không đúng định dạng hoặc vượt quá 100 ký tự.");
             return;
         }
 
-        // Kiểm tra độ dài họ và tên
+        // 3. Kiểm tra giới hạn độ dài họ và tên (tối đa 100 ký tự)
         if (trimmedFullName.length > 100) {
             setEditError("Họ và tên không được vượt quá 100 ký tự.");
             return;
         }
 
-        // Kiểm tra định dạng số điện thoại (nếu có nhập)
+        // 4. Kiểm tra định dạng số điện thoại nếu người dùng có nhập (9-15 chữ số)
         if (trimmedPhone) {
             const phoneRegex = /^\+?[0-9]{9,15}$/;
             if (!phoneRegex.test(trimmedPhone)) {
@@ -246,8 +284,10 @@ export default function AdminUsers() {
             }
         }
 
+        // 5. Bật cờ trạng thái đang lưu dữ liệu
         setEditSaving(true);
         try {
+            // 6. Đóng gói payload gửi lên server
             const payload = {
                 fullName: trimmedFullName,
                 email: trimmedEmail,
@@ -255,15 +295,19 @@ export default function AdminUsers() {
                 status: editForm.status,
                 role: editForm.role,
             };
+            // 7. Gọi hàm updateCustomer gửi request PUT /api/users/{id}
             const updated = await updateCustomer(editingCustomer.id, payload);
-            // Cập nhật lại đối tượng trong state customers mà không cần tải lại toàn bộ trang
+            // 8. Cập nhật lại đối tượng trong state customers mà không cần tải lại toàn bộ trang
             setCustomers((current) =>
                 current.map((item) => (item.id === updated.id ? updated : item))
             );
+            // 9. Đóng modal chỉnh sửa
             setEditingCustomer(null);
         } catch (err) {
+            // 10. Ghi nhận lỗi nếu server trả về lỗi (ví dụ trùng email)
             setEditError(err.message || "Không thể cập nhật thông tin tài khoản.");
         } finally {
+            // 11. Tắt cờ trạng thái lưu
             setEditSaving(false);
         }
     }

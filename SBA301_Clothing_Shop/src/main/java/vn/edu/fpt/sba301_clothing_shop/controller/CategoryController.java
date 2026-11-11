@@ -36,7 +36,8 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<List<CategoryResponse>>
     getAllCategories() {
-
+        // 1. Gọi CategoryService để lấy toàn bộ danh mục sản phẩm kèm ảnh và giá thấp nhất
+        // 2. Trả về mã HTTP 200 OK kèm danh sách kết quả cho client
         return ResponseEntity.ok(
                 categoryService.getAllCategories()
         );
@@ -54,6 +55,8 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> createCategory(
             @Valid @RequestBody CategoryRequest request
     ) {
+        // 1. Gọi Service tạo danh mục sau khi kiểm tra tính hợp lệ và không trùng tên
+        // 2. Trả về mã HTTP 201 Created cùng đối tượng CategoryResponse vừa lưu
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(categoryService.createCategory(request));
@@ -73,6 +76,8 @@ public class CategoryController {
             @PathVariable Integer id,
             @Valid @RequestBody CategoryRequest request
     ) {
+        // 1. Gọi Service cập nhật tên danh mục theo ID
+        // 2. Trả về mã HTTP 200 OK cùng dữ liệu mới sau khi sửa
         return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 
@@ -86,7 +91,9 @@ public class CategoryController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
+        // 1. Gọi Service thực hiện xóa danh mục (sẽ kiểm tra nếu có sản phẩm thì ném lỗi 409 Conflict)
         categoryService.deleteCategory(id);
+        // 2. Trả về mã HTTP 204 No Content thông báo xóa thành công
         return ResponseEntity.noContent().build();
     }
 }

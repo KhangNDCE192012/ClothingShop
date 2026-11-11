@@ -36,7 +36,9 @@ public class CartController {
     public ResponseEntity<List<Cart>> getMyCart(
             Authentication authentication
     ){
+        // 1. Trích xuất username của tài khoản đang đăng nhập từ Authentication
         String username = authentication.getName();
+        // 2. Gọi CartService lấy danh sách sản phẩm trong giỏ và trả về HTTP 200 OK
         return ResponseEntity.ok(
                 cartService.getMyCart(username)
         );
@@ -55,8 +57,10 @@ public class CartController {
             Authentication authentication,
             @Valid @RequestBody CartRequest request
     ) {
+        // 1. Lấy username của tài khoản đang đăng nhập
         String username = authentication.getName();
 
+        // 2. Gọi CartService thêm biến thể sản phẩm vào giỏ hàng và trả về kết quả
         return ResponseEntity.ok(
                 cartService.addToCart(username, request)
         );
@@ -75,8 +79,10 @@ public class CartController {
             Authentication authentication,
             @Valid @RequestBody CartRequest request
     ) {
+        // 1. Lấy username của tài khoản đang đăng nhập
         String username = authentication.getName();
 
+        // 2. Gọi CartService cập nhật số lượng mới và trả về đối tượng Cart sau khi đổi
         return ResponseEntity.ok(
                 cartService.updateQuantityChange(username, request)
         );
